@@ -13,11 +13,16 @@ class ToneTokenizer(StimulusTokenizer):
     def __init__(self, block_name, stim_configs):
         StimulusTokenizer.__init__(self, block_name, stim_configs)
 
+        # list of ('column_name', 'column_description')
+        self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
+                        ('frq', 'Stimulus Frequency'),
+                        ('amp', 'Stimulus Amplitude')]
+
     def tokenize(self, nwb_content, mark_name='recorded_mark'):
         """
         """
 
-        if self.__already_tokenized(nwb_content):
+        if self._already_tokenized(nwb_content):
             print('Block has already been tokenized')
             return
 
@@ -27,9 +32,7 @@ class ToneTokenizer(StimulusTokenizer):
         bl_start = self.stim_configs['baseline_start']
         bl_end = self.stim_configs['baseline_end']
 
-        nwb_content.add_trial_column('sb', 'Stimulus (s) or baseline (b) period')
-        nwb_content.add_trial_column('frq', 'Stimulus Frequency')
-        nwb_content.add_trial_column('amp', 'Stimulus Amplitude')
+        self._add_trial_columns(nwb_content)
 
         # Add the pre-stimulus period to baseline
         nwb_content.add_trial(start_time=0.0,
@@ -58,12 +61,6 @@ class ToneTokenizer(StimulusTokenizer):
         rec_end_time = self._get_end_time(nwb_content, mark_name)
         nwb_content.add_trial(start_time=stim_onsets[-1]+bl_end, stop_time=rec_end_time,
                                 sb='b', frq=frq, amp=amp)
-
-    def __already_tokenized(self, nwb_content):
-        return (nwb_content.trials and
-                'sb' in nwb_content.trials.colnames and
-                'frq' in nwb_content.trials.colnames and
-                'amp' in nwb_content.trials.colnames)
 
     def __get_stim_onsets(self, nwb_content, mark_name):
         mark_dset = self.read_mark(nwb_content, mark_name)
