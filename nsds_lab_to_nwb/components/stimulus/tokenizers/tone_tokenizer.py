@@ -12,6 +12,7 @@ class ToneTokenizer(BaseTokenizer):
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
+        self.tokenizer_type = 'ToneTokenizer'
 
         # list of ('column_name', 'column_description')
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
@@ -44,13 +45,3 @@ class ToneTokenizer(BaseTokenizer):
                                 sb='b', frq=frq, amp=amp))
 
         return trial_list
-
-    def _get_stim_onsets(self, mark_dset):
-        mark_fs = mark_dset.rate
-        mark_offset = self.stim_configs['mark_offset']
-        stim_dur = self.stim_configs['duration']
-
-        mark_trk, mark_threshold = self._get_mark_threshold(mark_dset)
-        thresh_crossings = np.diff( (mark_trk > mark_threshold).astype('int'), axis=0)
-        stim_onsets = np.where(thresh_crossings > 0.5)[0] + 1
-        return (stim_onsets / mark_fs) + mark_offset

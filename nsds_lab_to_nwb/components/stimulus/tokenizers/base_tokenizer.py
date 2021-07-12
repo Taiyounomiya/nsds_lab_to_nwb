@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class BaseTokenizer():
     """ Base Tokenizer class for auditory stimulus data
     """
@@ -23,10 +26,18 @@ class BaseTokenizer():
         raise NotImplementedError
 
     def _get_stim_onsets(self, mark_dset):
-        raise NotImplementedError
+        mark_fs = mark_dset.rate
+        mark_offset = self.stim_configs['mark_offset']
 
-    def _get_mark_threshold(self, mark_dset):
-        return mark_dset.data[:], self.stim_configs['mark_threshold']
+        mark_trk = mark_dset.data[:]
+        mark_threshold = self.stim_configs['mark_threshold']
+        thresh_crossings = np.diff((mark_trk > mark_threshold).astype('int'),
+                                   axis=0)
+        # adding +1 because diff gets rid of the 1st datapoint
+        stim_onsets_idx = np.where(thresh_crossings > 0.5)[0] + 1
+
+        stim_onsets = (stim_onsets_idx / mark_fs) + mark_offset
+        return stim_onsets
 
     def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
         ''' Validate that the number of identified stim onsets
