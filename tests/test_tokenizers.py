@@ -1,14 +1,14 @@
 import unittest
 import os
+import uuid
 
 from pynwb import NWBFile
 from nsds_lab_to_nwb.common.data_scanners import AuditoryDataScanner
 from nsds_lab_to_nwb.common.time import get_default_time
-from nsds_lab_to_nwb.components.stimulus.stimulus_originator import StimulusOriginator
+from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
+from nsds_lab_to_nwb.components.stimulus.mark_tokenizer import MarkTokenizer
+from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
 from nsds_lab_to_nwb.metadata.metadata_manager import MetadataManager
-from nsds_lab_to_nwb.components.stimulus.tokenizers.tone_tokenizer import ToneTokenizer
-from nsds_lab_to_nwb.components.stimulus.tokenizers.timit_tokenizer import TIMITTokenizer
-from nsds_lab_to_nwb.components.stimulus.tokenizers.wn_tokenizer import WNTokenizer
 from nsds_lab_to_nwb.utils import (get_data_path, get_metadata_lib_path, get_stim_lib_path,
                                    split_block_folder)
 
@@ -44,32 +44,25 @@ class TestCase_Tokenizers(unittest.TestCase):
                                    legacy_block=False).extract_metadata()
         stim_configs = metadata['stimulus']
 
+        sve = StimValueExtractor(stim_configs, self.stim_lib_path)
+        stim_configs['stim_values'] = sve.extract()
+
         dataset = AuditoryDataScanner(block_name,
                                       data_path=self.data_path,
                                       stim_lib_path=self.stim_lib_path,
                                       use_htk=False).extract_dataset()
 
-        # choose tokenizer
-        stim_name = stim_configs['name']
-        if 'tone' in stim_name:
-            tokenizer = ToneTokenizer(block_name, stim_configs)
-        elif 'timit' in stim_name:
-            tokenizer = TIMITTokenizer(block_name, stim_configs)
-        elif 'wn' in stim_name:
-            tokenizer = WNTokenizer(block_name, stim_configs)
-        else:
-            raise ValueError(f"Unknown stimulus type '{stim_name}' for mark tokenizer")
-
         # create an empty NWB file
         nwb_content = NWBFile(session_description='test stim tokenizers',  # required
-                              identifier='NWB000',  # required
+                              identifier=str(uuid.uuid1()),  # required
                               session_start_time=get_default_time())  # required
-        # add stimulus
-        stimulus_originator = StimulusOriginator(dataset, metadata)
-        stimulus_originator.make(nwb_content)
+        # add mark track
+        mark_time_series = MarkManager(dataset).get_mark_track(starting_time=0.0)
+        nwb_content.add_stimulus(mark_time_series)
 
         # tokenize
-        tokenizer.tokenize(nwb_content)
+        mark_tokenizer = MarkTokenizer(block_name, stim_configs)
+        mark_tokenizer.tokenize(nwb_content)
 
 
 if __name__ == '__main__':
