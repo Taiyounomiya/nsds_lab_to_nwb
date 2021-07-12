@@ -62,10 +62,9 @@ def tone_stimulus_values(mat_file_path):
 
     Returns:
     --------
-    stim_vals: a 2D array with two rows along the leading dimension.
-        stim_vals[0, :] are the amplitudes,
-        stim_vals[1, :] are the frequencies of the tones.
-        (should confirm!)
+    stim_vals: a 2D array with two columns (NOTE: changed from legacy behavior)
+        stim_vals[:, 0] are the amplitudes,
+        stim_vals[:, 1] are the frequencies of the tones.
     '''
     sio = read_mat_file(mat_file_path)
     stim_vals = sio['stimVls'][:].astype(int)
@@ -73,15 +72,16 @@ def tone_stimulus_values(mat_file_path):
     # check dimension
     shape = stim_vals.shape
     if not (len(shape) == 2) and (2 in shape):
-        # should be a 2D array, with 2 rows (or 2 columns)
+        # should be a 2D array, with 2 columns or 2 rows
         raise ValueError('stim_vals dimension mismatch')
-    if shape[1] == 2:
+    if shape[0] == 2:
+        # changed from legacy behavior (now 2 columns; was 2 rows in mars)
         stim_vals = stim_vals.T
 
     # this offset value comes from mars; what is this?
     # variable naming (amp_offset) was by JHB and could be wrong
     amp_offset = 8
-    stim_vals[0, :] = stim_vals[0, :] + amp_offset
+    stim_vals[:, 0] = stim_vals[:, 0] + amp_offset
 
     return stim_vals
 

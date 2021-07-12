@@ -26,18 +26,18 @@ class ToneTokenizer(BaseTokenizer):
         trial_list.append(dict(start_time=0.0,
                                 stop_time=stim_onsets[0]-stim_dur,
                                 sb='b',
-                                frq=str(float(stim_vals[1,0])),
-                                amp=str(float(stim_vals[0,0]))))
+                                frq=str(float(stim_vals[0, 1])),
+                                amp=str(float(stim_vals[0, 0]))))
 
         # TODO: Assert that the # of stim vals is equal to the number of found onsets
-        assert len(stim_onsets)==stim_vals.shape[1], (
+        assert len(stim_onsets)==len(stim_vals), (
                     "Incorrect number of stimulus onsets found."
-                    + " Expected {:d}, found {:d}.".format(stim_vals.shape[1],len(stim_onsets))
+                    + " Expected {:d}, found {:d}.".format(len(stim_vals), len(stim_onsets))
                     + " Perhaps you are not using the correct tokenizer?"
                     )
         for i, onset in enumerate(stim_onsets):
-            frq = str(stim_vals[1,i])
-            amp = str(stim_vals[0,i])
+            frq = str(stim_vals[i, 1])
+            amp = str(stim_vals[i, 0])
             trial_list.append(dict(start_time=onset, stop_time=onset+stim_dur,
                                     sb='s', frq=frq, amp=amp))
             if bl_start==bl_end:
