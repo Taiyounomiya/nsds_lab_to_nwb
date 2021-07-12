@@ -1,4 +1,4 @@
-class StimulusTokenizer():
+class BaseTokenizer():
     """ Base Tokenizer class for auditory stimulus data
     """
     def __init__(self, block_name, stim_configs):

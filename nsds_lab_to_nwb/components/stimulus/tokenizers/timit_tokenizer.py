@@ -1,9 +1,9 @@
 import numpy as np
 
-from nsds_lab_to_nwb.components.stimulus.tokenizers.stimulus_tokenizer import StimulusTokenizer
+from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTokenizer
 
 
-class TIMITTokenizer(StimulusTokenizer):
+class TIMITTokenizer(BaseTokenizer):
     """
     Tokenize TIMIT stimulus data
 
@@ -11,7 +11,7 @@ class TIMITTokenizer(StimulusTokenizer):
     As part of MARS
     """
     def __init__(self, block_name, stim_configs):
-        StimulusTokenizer.__init__(self, block_name, stim_configs)
+        BaseTokenizer.__init__(self, block_name, stim_configs)
 
         # list of ('column_name', 'column_description')
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
