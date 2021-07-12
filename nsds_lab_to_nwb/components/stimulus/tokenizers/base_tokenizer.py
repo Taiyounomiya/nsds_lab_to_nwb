@@ -13,8 +13,12 @@ class BaseTokenizer():
             return
         self._add_trial_columns(nwb_content)
         mark_dset = self.read_mark(nwb_content, mark_name)
-        rec_end_time = self._get_end_time(nwb_content, mark_name)
-        trial_list = self._tokenize(stim_vals, mark_dset, rec_end_time)
+        rec_end_time = mark_dset.num_samples / mark_dset.rate
+        trial_list = self._tokenize(stim_vals, mark_dset,
+                                    stim_dur=self.stim_configs['duration'],
+                                    bl_start=self.stim_configs['baseline_start'],
+                                    bl_end=self.stim_configs['baseline_end'],
+                                    rec_end_time=rec_end_time)
         for trial_kwargs in trial_list:
             nwb_content.add_trial(**trial_kwargs)
 
@@ -39,13 +43,11 @@ class BaseTokenizer():
         for column_args in self.custom_columns:
             nwb_content.add_trial_column(*column_args)
 
-    def _get_end_time(self, nwb_content, mark_name):
-        mark_dset = self.read_mark(nwb_content, mark_name=mark_name)
-        end_time = mark_dset.num_samples/mark_dset.rate
-        return end_time
-
     def read_mark(self, nwb_content, mark_name='recorded_mark'):
         return nwb_content.stimulus[mark_name]
+
+    def _get_mark_threshold(self, mark_dset):
+        return mark_dset.data[:], self.stim_configs['mark_threshold']
 
     def read_raw(self, nwb_content, device_name):
         """

@@ -16,7 +16,8 @@ class WNTokenizer(BaseTokenizer):
         # list of ('column_name', 'column_description')
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
 
-    def _tokenize(self, stim_vals, mark_dset, rec_end_time):
+    def _tokenize(self, stim_vals, mark_dset,
+                  *, stim_dur, bl_start, bl_end, rec_end_time):
         """
         Required: mark track
 
@@ -24,9 +25,6 @@ class WNTokenizer(BaseTokenizer):
                 baseline as "baseline"
         """
         stim_onsets = self.__get_stim_onsets(mark_dset)
-        stim_dur = self.stim_configs['duration']
-        bl_start = self.stim_configs['baseline_start']
-        bl_end = self.stim_configs['baseline_end']
 
         trial_list = []
 

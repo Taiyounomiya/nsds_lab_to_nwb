@@ -18,13 +18,11 @@ class ToneTokenizer(BaseTokenizer):
                         ('frq', 'Stimulus Frequency'),
                         ('amp', 'Stimulus Amplitude')]
 
-    def _tokenize(self, stim_vals, mark_dset, rec_end_time):
+    def _tokenize(self, stim_vals, mark_dset,
+                  *, stim_dur, bl_start, bl_end, rec_end_time):
         """
         """
         stim_onsets = self.__get_stim_onsets(mark_dset)
-        stim_dur = self.stim_configs['duration']
-        bl_start = self.stim_configs['baseline_start']
-        bl_end = self.stim_configs['baseline_end']
 
         trial_list = []
 
@@ -62,10 +60,7 @@ class ToneTokenizer(BaseTokenizer):
         mark_offset = self.stim_configs['mark_offset']
         stim_dur = self.stim_configs['duration']
 
-        mark_trk, mark_threshold = self.__get_mark_threshold(mark_dset)
+        mark_trk, mark_threshold = self._get_mark_threshold(mark_dset)
         thresh_crossings = np.diff( (mark_trk > mark_threshold).astype('int'), axis=0)
         stim_onsets = np.where(thresh_crossings > 0.5)[0] + 1
         return (stim_onsets / mark_fs) + mark_offset
-
-    def __get_mark_threshold(self, mark_dset):
-        return mark_dset.data[:], self.stim_configs['mark_threshold']
