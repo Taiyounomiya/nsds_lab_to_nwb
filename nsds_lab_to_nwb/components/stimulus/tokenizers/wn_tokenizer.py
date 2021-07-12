@@ -12,6 +12,7 @@ class WNTokenizer(BaseTokenizer):
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
+        self.tokenizer_type = 'WNTokenizer'
 
         # list of ('column_name', 'column_description')
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
@@ -64,9 +65,17 @@ class WNTokenizer(BaseTokenizer):
             # Check that each stim onset is more than 2x the stimulus duration since the previous
             if stim_onset > real_stim_onsets[-1] + 2*stim_dur_samp:
                 real_stim_onsets.append(stim_onset)
+        stim_onsets = (np.array(real_stim_onsets) / mark_fs) + mark_offset
+        return stim_onsets
 
-        if len(real_stim_onsets) != self.stim_configs['nsamples']:
-            print("WARNING: found {} stim onsets in block {}, but supposed to have {} samples".format(
-                len(real_stim_onsets), self.block_name, self.stim_configs['nsamples']))
-
-        return (np.array(real_stim_onsets) / mark_fs) + mark_offset
+    def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
+        # NOTE: stim_vals is not used here
+        num_onsets = len(stim_onsets)
+        num_expected_trials = self.stim_configs['nsamples']
+        if num_onsets != num_expected_trials:
+            # print("WARNING: found {} stim onsets in block {}, but supposed to have {} samples".format(
+            #     len(stim_onsets), self.block_name, self.stim_configs['nsamples']))
+            print(f"[WARNING] {self.tokenizer_type}: "
+                + "Incorrect number of stimulus onsets found "
+                + f"in block {self.block_name}. "
+                + f"Expected {num_expected_trials}, found {num_onsets}.")

@@ -29,12 +29,6 @@ class ToneTokenizer(BaseTokenizer):
                                 frq=str(float(stim_vals[0, 1])),
                                 amp=str(float(stim_vals[0, 0]))))
 
-        # TODO: Assert that the # of stim vals is equal to the number of found onsets
-        assert len(stim_onsets)==len(stim_vals), (
-                    "Incorrect number of stimulus onsets found."
-                    + " Expected {:d}, found {:d}.".format(len(stim_vals), len(stim_onsets))
-                    + " Perhaps you are not using the correct tokenizer?"
-                    )
         for i, onset in enumerate(stim_onsets):
             frq = str(stim_vals[i, 1])
             amp = str(stim_vals[i, 0])

@@ -12,6 +12,7 @@ class TIMITTokenizer(BaseTokenizer):
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
+        self.tokenizer_type = 'TIMITTokenizer'
 
         # list of ('column_name', 'column_description')
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
@@ -25,12 +26,6 @@ class TIMITTokenizer(BaseTokenizer):
         trial_list.append(dict(start_time=0.0, stop_time=stim_onsets[0]-stim_dur,
                                sb='b', sample_filename=stim_vals[0]))
 
-        # TODO: Assert that the # of stim vals is equal to the number of found onsets
-        assert len(stim_onsets)==len(stim_vals), (
-                    "Incorrect number of stimulus onsets found."
-                    + " Expected {:d}, found {:d}.".format(len(stim_vals), len(stim_onsets))
-                    + " Perhaps you are not using the correct tokenizer?"
-                    )
         for i, onset in enumerate(stim_onsets):
             filename = str(stim_vals[i])
             trial_list.append(dict(start_time=onset, stop_time=onset+stim_dur, sb='s',sample_filename=filename))

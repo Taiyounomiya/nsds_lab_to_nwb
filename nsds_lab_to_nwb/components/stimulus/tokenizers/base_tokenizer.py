@@ -5,10 +5,12 @@ class BaseTokenizer():
         self.block_name = block_name
         self.stim_configs = stim_configs
 
+        self.tokenizer_type = 'BaseTokenizer'
         self.custom_columns = None
 
     def tokenize(self, mark_dset, stim_vals):
         stim_onsets = self._get_stim_onsets(mark_dset)
+        self._validate_num_stim_onsets(stim_vals, stim_onsets)
         rec_end_time = mark_dset.num_samples / mark_dset.rate
         trial_list = self._tokenize(stim_vals, stim_onsets,
                                     stim_dur=self.stim_configs['duration'],
@@ -25,3 +27,15 @@ class BaseTokenizer():
 
     def _get_mark_threshold(self, mark_dset):
         return mark_dset.data[:], self.stim_configs['mark_threshold']
+
+    def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
+        ''' Validate that the number of identified stim onsets
+        is equal to the number of stim parameterizations in stim_vals.
+        '''
+        num_onsets = len(stim_onsets)
+        num_expected_trials = len(stim_vals)
+        assert num_onsets==num_expected_trials, (
+            f"{self.tokenizer_type}: "
+            + "Incorrect number of stimulus onsets found "
+            + f"in block {self.block_name}. "
+            + f"Expected {num_expected_trials}, found {num_onsets}.")
