@@ -1,6 +1,6 @@
 from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
-from nsds_lab_to_nwb.components.stimulus.mark_tokenizer import MarkTokenizer
 from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
+from nsds_lab_to_nwb.components.stimulus.trials_manager import TrialsManager
 from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
 from nsds_lab_to_nwb.utils import get_stim_lib_path
 
@@ -16,7 +16,7 @@ class StimulusOriginator():
                                             self.stim_lib_path).extract()
 
         self.mark_manager = MarkManager(self.dataset)
-        self.mark_tokenizer = MarkTokenizer(self.metadata['block_name'],
+        self.trials_manager = TrialsManager(self.metadata['block_name'],
                                             self.stim_configs)
 
         self.wav_manager = WavManager(self.stim_lib_path,
@@ -29,7 +29,7 @@ class StimulusOriginator():
         nwb_content.add_stimulus(mark_time_series)
 
         # tokenize into trials, once mark track has been added to nwb_content
-        self.mark_tokenizer.tokenize(nwb_content, self.stim_vals)
+        self.trials_manager.add_trials(nwb_content, self.stim_vals)
 
         # add stimulus WAV data
         stim_starting_time = self._get_stim_starting_time(nwb_content)

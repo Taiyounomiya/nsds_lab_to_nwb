@@ -17,12 +17,8 @@ class TIMITTokenizer(BaseTokenizer):
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                         ('sample_filename', 'Sample Filename')]
 
-    def _tokenize(self, stim_vals, mark_dset,
+    def _tokenize(self, stim_vals, stim_onsets,
                   *, stim_dur, bl_start, bl_end, rec_end_time):
-        """
-        """
-        stim_onsets = self.__get_stim_onsets(mark_dset)
-
         trial_list = []
 
         # Add the pre-stimulus period to baseline
@@ -46,7 +42,7 @@ class TIMITTokenizer(BaseTokenizer):
 
         return trial_list
 
-    def __get_stim_onsets(self, mark_dset):
+    def _get_stim_onsets(self, mark_dset):
         mark_fs = mark_dset.rate
         mark_offset = self.stim_configs['mark_offset']
         stim_dur = self.stim_configs['duration']

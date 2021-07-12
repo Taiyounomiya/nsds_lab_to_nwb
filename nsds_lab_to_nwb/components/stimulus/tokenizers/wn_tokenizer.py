@@ -16,16 +16,16 @@ class WNTokenizer(BaseTokenizer):
         # list of ('column_name', 'column_description')
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
 
-    def _tokenize(self, stim_vals, mark_dset,
+    def _tokenize(self, stim_vals, stim_onsets,
                   *, stim_dur, bl_start, bl_end, rec_end_time):
         """
+        (caveat: docstring is outdated)
+
         Required: mark track
 
         Output: stim on/off as "wn"
                 baseline as "baseline"
         """
-        stim_onsets = self.__get_stim_onsets(mark_dset)
-
         trial_list = []
 
         # Add the pre-stimulus period to baseline
@@ -42,11 +42,13 @@ class WNTokenizer(BaseTokenizer):
 
         return trial_list
 
-    def __get_stim_onsets(self, mark_dset):
+    def _get_stim_onsets(self, mark_dset):
         if 'Simulation' in self.block_name:
-            raw_dset = self.read_raw('ECoG')
-            end_time = raw_dset.data.shape[0] / raw_dset.rate
-            return np.arange(0.5, end_time, 1.0)
+            # # (mars legacy code, now broken)
+            # raw_dset = nwb_content.acquisition['ECoG']
+            # end_time = raw_dset.data.shape[0] / raw_dset.rate
+            # return np.arange(0.5, end_time, 1.0)
+            raise NotImplementedError('not supported in nsds_lab_to_nwb')
 
         mark_fs = mark_dset.rate
         mark_offset = self.stim_configs['mark_offset']

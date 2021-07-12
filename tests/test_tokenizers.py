@@ -6,8 +6,8 @@ from pynwb import NWBFile
 from nsds_lab_to_nwb.common.data_scanners import AuditoryDataScanner
 from nsds_lab_to_nwb.common.time import get_default_time
 from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
-from nsds_lab_to_nwb.components.stimulus.mark_tokenizer import MarkTokenizer
 from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
+from nsds_lab_to_nwb.components.stimulus.trials_manager import TrialsManager
 from nsds_lab_to_nwb.metadata.metadata_manager import MetadataManager
 from nsds_lab_to_nwb.utils import (get_data_path, get_metadata_lib_path, get_stim_lib_path,
                                    split_block_folder)
@@ -58,9 +58,9 @@ class TestCase_Tokenizers(unittest.TestCase):
         mark_time_series = MarkManager(dataset).get_mark_track(starting_time=0.0)
         nwb_content.add_stimulus(mark_time_series)
 
-        # tokenize
-        mark_tokenizer = MarkTokenizer(block_name, stim_configs)
-        mark_tokenizer.tokenize(nwb_content, stim_vals)
+        # tokenize and add trials
+        trials_manager = TrialsManager(block_name, stim_configs)
+        trials_manager.add_trials(nwb_content, stim_vals)
 
 
 if __name__ == '__main__':
