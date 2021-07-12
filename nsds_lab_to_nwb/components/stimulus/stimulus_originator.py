@@ -11,7 +11,9 @@ class StimulusOriginator():
         self.metadata = metadata
         self.stim_lib_path = get_stim_lib_path(self.dataset.stim_lib_path)
         self.stim_configs = self.metadata['stimulus']
-        self._load_stim_values()  # update self.stim_configs
+
+        self.stim_vals = StimValueExtractor(self.stim_configs,
+                                            self.stim_lib_path).extract()
 
         self.mark_manager = MarkManager(self.dataset)
         self.mark_tokenizer = MarkTokenizer(self.metadata['block_name'],
@@ -27,7 +29,7 @@ class StimulusOriginator():
         nwb_content.add_stimulus(mark_time_series)
 
         # tokenize into trials, once mark track has been added to nwb_content
-        self.mark_tokenizer.tokenize(nwb_content)
+        self.mark_tokenizer.tokenize(nwb_content, self.stim_vals)
 
         # add stimulus WAV data
         stim_starting_time = self._get_stim_starting_time(nwb_content)
@@ -48,10 +50,3 @@ class StimulusOriginator():
                               - self.stim_configs['mark_offset']  # adjust for mark offset
                               - self.stim_configs['first_mark'])  # time between stimulus DVD start and the first mark
         return stim_starting_time
-
-    def _load_stim_values(self):
-        '''load stim_values from .mat or .csv files,
-        or generate using original script (mars/configs/block_directory.py)
-        '''
-        sve = StimValueExtractor(self.stim_configs, self.stim_lib_path)
-        self.stim_configs['stim_values'] = sve.extract()

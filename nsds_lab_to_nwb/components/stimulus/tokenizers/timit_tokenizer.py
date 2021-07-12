@@ -17,11 +17,10 @@ class TIMITTokenizer(StimulusTokenizer):
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                         ('sample_filename', 'Sample Filename')]
 
-    def _tokenize(self, mark_dset, rec_end_time):
+    def _tokenize(self, stim_vals, mark_dset, rec_end_time):
         """
         """
         stim_onsets = self.__get_stim_onsets(mark_dset)
-        stim_vals = self.stim_configs['stim_values']
         stim_dur = self.stim_configs['duration']
         bl_start = self.stim_configs['baseline_start']
         bl_end = self.stim_configs['baseline_end']

@@ -43,9 +43,7 @@ class TestCase_Tokenizers(unittest.TestCase):
                                    metadata_lib_path=self.metadata_lib_path,
                                    legacy_block=False).extract_metadata()
         stim_configs = metadata['stimulus']
-
-        sve = StimValueExtractor(stim_configs, self.stim_lib_path)
-        stim_configs['stim_values'] = sve.extract()
+        stim_vals = StimValueExtractor(stim_configs, self.stim_lib_path).extract()
 
         dataset = AuditoryDataScanner(block_name,
                                       data_path=self.data_path,
@@ -62,7 +60,7 @@ class TestCase_Tokenizers(unittest.TestCase):
 
         # tokenize
         mark_tokenizer = MarkTokenizer(block_name, stim_configs)
-        mark_tokenizer.tokenize(nwb_content)
+        mark_tokenizer.tokenize(nwb_content, stim_vals)
 
 
 if __name__ == '__main__':

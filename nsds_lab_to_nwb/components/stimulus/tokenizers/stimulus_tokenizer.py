@@ -7,14 +7,14 @@ class StimulusTokenizer():
 
         self.custom_columns = None
 
-    def tokenize(self, nwb_content, mark_name='recorded_mark'):
+    def tokenize(self, nwb_content, stim_vals, mark_name='recorded_mark'):
         if self._already_tokenized(nwb_content):
             print('Block has already been tokenized')
             return
         self._add_trial_columns(nwb_content)
         mark_dset = self.read_mark(nwb_content, mark_name)
         rec_end_time = self._get_end_time(nwb_content, mark_name)
-        trial_list = self._tokenize(mark_dset, rec_end_time)
+        trial_list = self._tokenize(stim_vals, mark_dset, rec_end_time)
         for trial_kwargs in trial_list:
             nwb_content.add_trial(**trial_kwargs)
 

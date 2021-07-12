@@ -16,7 +16,7 @@ class WNTokenizer(StimulusTokenizer):
         # list of ('column_name', 'column_description')
         self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
 
-    def _tokenize(self, mark_dset, rec_end_time):
+    def _tokenize(self, stim_vals, mark_dset, rec_end_time):
         """
         Required: mark track
 

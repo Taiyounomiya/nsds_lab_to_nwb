@@ -23,7 +23,7 @@ class MarkTokenizer():
         else:
             raise ValueError(f"Unknown stimulus type '{stim_name}' for mark tokenizer")
 
-    def tokenize(self, nwb_content):
+    def tokenize(self, nwb_content, stim_vals):
         if not self.tokenizable:
             return
-        self.tokenizer.tokenize(nwb_content)
+        self.tokenizer.tokenize(nwb_content, stim_vals)
