@@ -1,6 +1,10 @@
+import logging
 import numpy as np
 
 from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTokenizer
+
+logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 
 class WNTokenizer(BaseTokenizer):
@@ -55,13 +59,19 @@ class WNTokenizer(BaseTokenizer):
         stim_dur = self.stim_configs['duration']
         stim_dur_samp = stim_dur * mark_fs
 
-        if self.stim_configs.get('mark_is_stim'):
+        if self.stim_configs.get('mark_is_stim', False):
+            # NOTE: this is true for stimulus wn1, but not wn2
             mark_threshold = 0.25  # this value takes priority
+        # ---------------------------------------------------------------------
+        # for now hard-coding this threshold for WN2 - confirm!
+        mark_threshold = 0.1  # arbitrary value, but this seems to work for wn2 (RVG16_B01)
+        # ---------------------------------------------------------------------
         stim_onsets_idx = super()._get_stim_onsets(mark_dset, mark_threshold=mark_threshold)
 
         # Check that each stim onset is more than 2x the stimulus duration since the previous
         minimal_interval = (2 * stim_dur_samp)
         stim_onsets_idx = self.__require_minimal_interval(stim_onsets_idx, minimal_interval)
+        logger.debug(f'filtered to {len(stim_onsets_idx)} onsets')
         return stim_onsets_idx
 
     def __require_minimal_interval(self, stim_onsets_idx, minimal_interval):

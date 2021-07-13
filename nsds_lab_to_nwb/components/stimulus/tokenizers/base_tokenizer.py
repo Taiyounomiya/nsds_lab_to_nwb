@@ -1,4 +1,8 @@
+import logging
 import numpy as np
+
+logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 
 class BaseTokenizer():
@@ -36,10 +40,14 @@ class BaseTokenizer():
         mark_trk = mark_dset.data[:]
         if mark_threshold is None:
             mark_threshold = self.stim_configs['mark_threshold']
+            logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
+        else:
+            logger.debug(f'using mark_threshold={mark_threshold} fixed by tokenizer')
         thresh_crossings = np.diff((mark_trk > mark_threshold).astype('int'),
                                    axis=0)
         # adding +1 because diff gets rid of the 1st datapoint
         stim_onsets_idx = np.where(thresh_crossings > 0.5)[0] + 1
+        logger.debug(f'found {len(stim_onsets_idx)} onsets')
         return stim_onsets_idx
 
     def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
