@@ -13,12 +13,12 @@ class BaseTokenizer():
         self.stim_configs = stim_configs
 
         self.tokenizer_type = 'BaseTokenizer'
-        self.custom_columns = None
+        self.custom_trial_columns = None
 
-    def tokenize(self, mark_dset, stim_vals):
-        stim_onsets = self.get_stim_onsets(mark_dset)
+    def tokenize(self, mark_time_series, stim_vals):
+        stim_onsets = self.get_stim_onsets(mark_time_series)
         self._validate_num_stim_onsets(stim_vals, stim_onsets)
-        rec_end_time = mark_dset.num_samples / mark_dset.rate
+        rec_end_time = mark_time_series.num_samples / mark_time_series.rate
         trial_list = self._tokenize(stim_vals, stim_onsets,
                                     stim_dur=self.stim_configs['duration'],
                                     bl_start=self.stim_configs['baseline_start'],
@@ -26,25 +26,27 @@ class BaseTokenizer():
                                     rec_end_time=rec_end_time)
         return trial_list
 
-    def _tokenize(self, mark_dset, rec_end_time):
+    def _tokenize(self, mark_time_series, rec_end_time):
         raise NotImplementedError
 
-    def get_stim_onsets(self, mark_dset):
-        mark_fs = mark_dset.rate
+    def get_stim_onsets(self, mark_time_series):
+        mark_fs = mark_time_series.rate
         mark_offset = self.stim_configs['mark_offset']
-        stim_onsets_idx = self._get_stim_onsets(mark_dset)
+        stim_onsets_idx = self._get_stim_onsets(mark_time_series)
         stim_onsets = (stim_onsets_idx / mark_fs) + mark_offset
         return stim_onsets
 
-    def _get_stim_onsets(self, mark_dset, mark_threshold=None):
-        mark_trk = mark_dset.data[:]
+    def _get_stim_onsets(self, mark_time_series, mark_threshold=None):
         if mark_threshold is None:
             mark_threshold = self.stim_configs['mark_threshold']
             logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
         else:
             logger.debug(f'using mark_threshold={mark_threshold} fixed by tokenizer')
-        thresh_crossings = np.diff((mark_trk > mark_threshold).astype('int'),
+
+        mark_data = mark_time_series.data[:]
+        thresh_crossings = np.diff((mark_data > mark_threshold).astype('int'),
                                    axis=0)
+
         # adding +1 because diff gets rid of the 1st datapoint
         stim_onsets_idx = np.where(thresh_crossings > 0.5)[0] + 1
         logger.debug(f'found {len(stim_onsets_idx)} onsets')

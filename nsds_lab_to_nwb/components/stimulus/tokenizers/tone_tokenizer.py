@@ -15,7 +15,7 @@ class ToneTokenizer(BaseTokenizer):
         self.tokenizer_type = 'ToneTokenizer'
 
         # list of ('column_name', 'column_description')
-        self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
+        self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                         ('frq', 'Stimulus Frequency'),
                         ('amp', 'Stimulus Amplitude')]
 

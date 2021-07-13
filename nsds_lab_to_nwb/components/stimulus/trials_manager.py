@@ -23,9 +23,9 @@ class TrialsManager():
         else:
             raise ValueError(f"Unknown stimulus type '{stim_name}' for mark tokenizer")
 
-        self.custom_columns = self.tokenizer.custom_columns
-        if self.custom_columns is None:
-            raise ValueError('self.custom_columns should be set by the stim-specific tokenizer.')
+        self.custom_trial_columns = self.tokenizer.custom_trial_columns
+        if self.custom_trial_columns is None:
+            raise ValueError('self.custom_trial_columns should be set by the stim-specific tokenizer.')
 
     def add_trials(self, nwb_content, stim_vals, mark_name='recorded_mark'):
         if not self.tokenizable:
@@ -35,11 +35,11 @@ class TrialsManager():
             return
 
         # tokenize to identify trials
-        mark_dset = self.read_mark(nwb_content, mark_name=mark_name)
-        trial_list = self.tokenizer.tokenize(mark_dset, stim_vals)
+        mark_time_series = self.read_mark(nwb_content, mark_name=mark_name)
+        trial_list = self.tokenizer.tokenize(mark_time_series, stim_vals)
 
         # add trial columns, then add trials
-        for column_args in self.custom_columns:
+        for column_args in self.custom_trial_columns:
             nwb_content.add_trial_column(*column_args)
         for trial_kwargs in trial_list:
             nwb_content.add_trial(**trial_kwargs)
@@ -47,10 +47,10 @@ class TrialsManager():
     def _already_tokenized(self, nwb_content):
         if not nwb_content.trials:
             return False
-        if self.custom_columns is None:
+        if self.custom_trial_columns is None:
             return False
         has_custom_trial_columns = ((column_args[0] in nwb_content.trials.colnames)
-                                    for column_args in self.custom_columns)
+                                    for column_args in self.custom_trial_columns)
         return all(has_custom_trial_columns)
 
     def read_mark(self, nwb_content, mark_name='recorded_mark'):

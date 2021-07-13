@@ -19,7 +19,7 @@ class WNTokenizer(BaseTokenizer):
         self.tokenizer_type = 'WNTokenizer'
 
         # list of ('column_name', 'column_description')
-        self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
+        self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
 
     def _tokenize(self, stim_vals, stim_onsets,
                   *, stim_dur, bl_start, bl_end, rec_end_time):
@@ -47,7 +47,7 @@ class WNTokenizer(BaseTokenizer):
 
         return trial_list
 
-    def _get_stim_onsets(self, mark_dset, mark_threshold=None):
+    def _get_stim_onsets(self, mark_time_series, mark_threshold=None):
         if 'Simulation' in self.block_name:
             # # (mars legacy code, now broken)
             # raw_dset = nwb_content.acquisition['ECoG']
@@ -55,7 +55,7 @@ class WNTokenizer(BaseTokenizer):
             # return np.arange(0.5, end_time, 1.0)
             raise NotImplementedError('not supported in nsds_lab_to_nwb')
 
-        mark_fs = mark_dset.rate
+        mark_fs = mark_time_series.rate
         stim_dur = self.stim_configs['duration']
         stim_dur_samp = stim_dur * mark_fs
 
@@ -69,7 +69,7 @@ class WNTokenizer(BaseTokenizer):
         # for now hard-coding this threshold for WN2 - confirm!
         mark_threshold = 0.1  # arbitrary value, but this seems to work for wn2 (RVG16_B01)
         # ---------------------------------------------------------------------
-        stim_onsets_idx = super()._get_stim_onsets(mark_dset, mark_threshold=mark_threshold)
+        stim_onsets_idx = super()._get_stim_onsets(mark_time_series, mark_threshold=mark_threshold)
 
         # Check that each stim onset is more than 2x the stimulus duration since the previous
         minimal_interval = (2 * stim_dur_samp)

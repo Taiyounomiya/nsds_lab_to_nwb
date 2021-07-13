@@ -15,7 +15,7 @@ class TIMITTokenizer(BaseTokenizer):
         self.tokenizer_type = 'TIMITTokenizer'
 
         # list of ('column_name', 'column_description')
-        self.custom_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
+        self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                         ('sample_filename', 'Sample Filename')]
 
     def _tokenize(self, stim_vals, stim_onsets,
