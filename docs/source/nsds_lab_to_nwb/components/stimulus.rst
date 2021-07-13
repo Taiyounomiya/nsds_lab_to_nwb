@@ -6,12 +6,12 @@ components.stimulus API
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: nsds_lab_to_nwb.components.stimulus.mark_tokenizer
+.. automodule:: nsds_lab_to_nwb.components.stimulus.stimulus_originator
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: nsds_lab_to_nwb.components.stimulus.stimulus_originator
+.. automodule:: nsds_lab_to_nwb.components.stimulus.trials_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -26,7 +26,7 @@ components.stimulus API
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: nsds_lab_to_nwb.components.stimulus.tokenizers.stimulus_tokenizer
+.. automodule:: nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer
    :members:
    :undoc-members:
    :show-inheritance:
