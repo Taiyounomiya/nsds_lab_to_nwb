@@ -32,17 +32,12 @@ class BaseTokenizer():
     def get_stim_onsets(self, mark_time_series):
         mark_fs = mark_time_series.rate
         mark_offset = self.stim_configs['mark_offset']
-        stim_onsets_idx = self._get_stim_onsets(mark_time_series)
+        mark_threshold = self._get_mark_threshold()
+        stim_onsets_idx = self._get_stim_onsets(mark_time_series, mark_threshold)
         stim_onsets = (stim_onsets_idx / mark_fs) + mark_offset
         return stim_onsets
 
-    def _get_stim_onsets(self, mark_time_series, mark_threshold=None):
-        if mark_threshold is None:
-            mark_threshold = self.stim_configs['mark_threshold']
-            logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
-        else:
-            logger.debug(f'using mark_threshold={mark_threshold} fixed by tokenizer')
-
+    def _get_stim_onsets(self, mark_time_series, mark_threshold):
         mark_data = mark_time_series.data[:]
         thresh_crossings = np.diff((mark_data > mark_threshold).astype('int'),
                                    axis=0)
@@ -51,6 +46,11 @@ class BaseTokenizer():
         stim_onsets_idx = np.where(thresh_crossings > 0.5)[0] + 1
         logger.debug(f'found {len(stim_onsets_idx)} onsets')
         return stim_onsets_idx
+
+    def _get_mark_threshold(self):
+        mark_threshold = self.stim_configs['mark_threshold']
+        logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
+        return mark_threshold
 
     def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
         ''' Validate that the number of identified stim onsets
