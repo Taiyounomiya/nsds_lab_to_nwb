@@ -43,7 +43,7 @@ class WNTokenizer(BaseTokenizer):
 
         return trial_list
 
-    def _get_stim_onsets(self, mark_dset):
+    def _get_stim_onsets(self, mark_dset, mark_threshold=None):
         if 'Simulation' in self.block_name:
             # # (mars legacy code, now broken)
             # raw_dset = nwb_content.acquisition['ECoG']
@@ -52,21 +52,26 @@ class WNTokenizer(BaseTokenizer):
             raise NotImplementedError('not supported in nsds_lab_to_nwb')
 
         mark_fs = mark_dset.rate
-        mark_offset = self.stim_configs['mark_offset']
         stim_dur = self.stim_configs['duration']
-        stim_dur_samp = stim_dur*mark_fs
+        stim_dur_samp = stim_dur * mark_fs
 
-        mark_threshold = 0.25 if self.stim_configs.get('mark_is_stim') else self.stim_configs['mark_threshold']
-        thresh_crossings = np.diff( (mark_dset.data[:] > mark_threshold).astype('int'), axis=0 )
-        stim_onsets = np.where(thresh_crossings > 0.5)[0] + 1 # +1 b/c diff gets rid of 1st datapoint
+        if self.stim_configs.get('mark_is_stim'):
+            mark_threshold = 0.25  # this value takes priority
+        stim_onsets_idx = super()._get_stim_onsets(mark_dset, mark_threshold=mark_threshold)
 
-        real_stim_onsets = [stim_onsets[0]]
-        for stim_onset in stim_onsets[1:]:
-            # Check that each stim onset is more than 2x the stimulus duration since the previous
-            if stim_onset > real_stim_onsets[-1] + 2*stim_dur_samp:
-                real_stim_onsets.append(stim_onset)
-        stim_onsets = (np.array(real_stim_onsets) / mark_fs) + mark_offset
-        return stim_onsets
+        # Check that each stim onset is more than 2x the stimulus duration since the previous
+        minimal_interval = (2 * stim_dur_samp)
+        stim_onsets_idx = self.__require_minimal_interval(stim_onsets_idx, minimal_interval)
+        return stim_onsets_idx
+
+    def __require_minimal_interval(self, stim_onsets_idx, minimal_interval):
+        real_stim_onsets_idx = []
+        prev_onset_i = None
+        for stim_onset_i in stim_onsets_idx:
+            if (prev_onset_i is None) or (stim_onset_i - prev_onset_i > minimal_interval):
+                real_stim_onsets_idx.append(stim_onset_i)
+                prev_onset_i = stim_onset_i
+        return np.array(real_stim_onsets_idx)
 
     def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
         # NOTE: stim_vals is not used here
