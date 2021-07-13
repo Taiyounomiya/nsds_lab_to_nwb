@@ -62,6 +62,9 @@ class WNTokenizer(BaseTokenizer):
         if self.stim_configs.get('mark_is_stim', False):
             # NOTE: this is true for stimulus wn1, but not wn2
             mark_threshold = 0.25  # this value takes priority
+        else:
+            # by default use the value in stimulus metadata
+            mark_threshold = self.stim_configs['mark_threshold']
         # ---------------------------------------------------------------------
         # for now hard-coding this threshold for WN2 - confirm!
         mark_threshold = 0.1  # arbitrary value, but this seems to work for wn2 (RVG16_B01)
