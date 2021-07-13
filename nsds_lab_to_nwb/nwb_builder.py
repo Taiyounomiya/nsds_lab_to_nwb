@@ -78,6 +78,9 @@ class NWBBuilder:
 
         self.source_script = self._get_source_script()
 
+        logger.info('==================================')
+        logger.info(f'Processing block {block_folder}.')
+
         logger.info('Collecting metadata for NWB conversion...')
         self.metadata = self._collect_nwb_metadata()
         self.experiment_type = self.metadata['experiment_type']
@@ -205,6 +208,7 @@ class NWBBuilder:
         else:
             logger.info('Skipping stimulus...')
 
+        logger.info('NWB content built successfully.')
         return nwb_content
 
     def write(self, content):
