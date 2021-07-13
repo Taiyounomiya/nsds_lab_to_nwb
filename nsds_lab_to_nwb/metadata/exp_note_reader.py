@@ -21,6 +21,7 @@ class ExpNoteReader():
         Google sheets because those parses are not
         implemented
     """
+
     def __init__(self, path, block_folder, input_format=None):
         self.path = path
         self.input_format = input_format
@@ -129,7 +130,6 @@ class ExpNoteReader():
         raw_meta = pd.read_csv(meta_path_file,
                                delimiter=',',
                                skiprows=1,
-                               names=['a', 'values', 'b', 'c'],
                                index_col=1,
                                dtype=str)
 
@@ -143,7 +143,6 @@ class ExpNoteReader():
         """
         path_file = os.path.join(self.path, self.file[0])
         raw_meta = pd.read_excel(path_file, sheet_name='MetaData', index_col=1,
-                                 names=['a', 'b', 'values', 'c', 'd'],
                                  dtype=str,
                                  engine='odf')
         raw_block = pd.read_excel(path_file, sheet_name='BlockData',
