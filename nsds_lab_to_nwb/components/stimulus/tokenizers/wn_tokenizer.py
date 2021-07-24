@@ -1,76 +1,109 @@
+import logging
 import numpy as np
 
-from nsds_lab_to_nwb.components.stimulus.tokenizers.stimulus_tokenizer import StimulusTokenizer
+from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTokenizer
+
+logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 
-class WNTokenizer(StimulusTokenizer):
+class WNTokenizer(BaseTokenizer):
     """
     Tokenize white noise stimulus data
-    
+
     Original version author: Vyassa Baratham <vbaratham@lbl.gov>
     As part of MARS
     """
     def __init__(self, block_name, stim_configs):
-        StimulusTokenizer.__init__(self, block_name, stim_configs)
+        BaseTokenizer.__init__(self, block_name, stim_configs)
+        self.tokenizer_type = 'WNTokenizer'
 
-    def tokenize(self, nwb_content, mark_name='recorded_mark'):
+        # list of ('column_name', 'column_description')
+        self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
+
+    def _tokenize(self, stim_vals, stim_onsets,
+                  *, stim_dur, bl_start, bl_end, rec_end_time):
         """
+        (caveat: docstring is outdated)
+
         Required: mark track
 
         Output: stim on/off as "wn"
                 baseline as "baseline"
         """
-        if self.__already_tokenized(nwb_content):
-            return
-        
-        stim_onsets = self.__get_stim_onsets(nwb_content, mark_name)
-        stim_dur = self.stim_configs['duration']
-        bl_start = self.stim_configs['baseline_start']
-        bl_end = self.stim_configs['baseline_end']
-
-        nwb_content.add_trial_column('sb', 'Stimulus (s) or baseline (b) period')
+        trial_list = []
 
         # Add the pre-stimulus period to baseline
-        # nwb_content.add_trial(start_time=0.0, stop_time=stim_onsets[0]-stim_dur, sb='b')
+        # trial_list.append(dict(start_time=0.0, stop_time=stim_onsets[0]-stim_dur, sb='b'))
 
         for onset in stim_onsets:
-            nwb_content.add_trial(start_time=onset, stop_time=onset+stim_dur, sb='s')
+            trial_list.append(dict(start_time=onset, stop_time=onset+stim_dur, sb='s'))
             if bl_start==bl_end:
                 continue
-            nwb_content.add_trial(start_time=onset+bl_start, stop_time=onset+bl_end, sb='b')
+            trial_list.append(dict(start_time=onset+bl_start, stop_time=onset+bl_end, sb='b'))
 
         # Add the period after the last stimulus to  baseline
-        # rec_end_time = self._get_end_time(nwb_content, mark_name)
-        # nwb_content.add_trial(start_time=stim_onsets[-1]+bl_end, stop_time=rec_end_time, sb='b')
+        # trial_list.append(dict(start_time=stim_onsets[-1]+bl_end, stop_time=rec_end_time, sb='b'))
 
-    def __already_tokenized(self, nwb_content):
-        return (nwb_content.trials and 
-                'sb' in nwb_content.trials.colnames)
+        return trial_list
 
-    def __get_stim_onsets(self, nwb_content, mark_name):
+    def _get_stim_onsets(self, mark_time_series, mark_threshold=None):
         if 'Simulation' in self.block_name:
-            raw_dset = self.read_raw('ECoG')
-            end_time = raw_dset.data.shape[0] / raw_dset.rate
-            return np.arange(0.5, end_time, 1.0)
-        
-        mark_dset = self.read_mark(nwb_content, mark_name)
-        mark_fs = mark_dset.rate
-        mark_offset = self.stim_configs['mark_offset']
+            # # (mars legacy code, now broken)
+            # raw_dset = nwb_content.acquisition['ECoG']
+            # end_time = raw_dset.data.shape[0] / raw_dset.rate
+            # return np.arange(0.5, end_time, 1.0)
+            raise NotImplementedError('not supported in nsds_lab_to_nwb')
+
+        mark_fs = mark_time_series.rate
         stim_dur = self.stim_configs['duration']
-        stim_dur_samp = stim_dur*mark_fs
+        stim_dur_samp = stim_dur * mark_fs
 
-        mark_threshold = 0.25 if self.stim_configs.get('mark_is_stim') else self.stim_configs['mark_threshold']
-        thresh_crossings = np.diff( (mark_dset.data[:] > mark_threshold).astype('int'), axis=0 )
-        stim_onsets = np.where(thresh_crossings > 0.5)[0] + 1 # +1 b/c diff gets rid of 1st datapoint
+        stim_onsets_idx = super()._get_stim_onsets(mark_time_series, mark_threshold=mark_threshold)
 
-        real_stim_onsets = [stim_onsets[0]]
-        for stim_onset in stim_onsets[1:]:
-            # Check that each stim onset is more than 2x the stimulus duration since the previous
-            if stim_onset > real_stim_onsets[-1] + 2*stim_dur_samp:
-                real_stim_onsets.append(stim_onset)
+        # Check that each stim onset is more than 2x the stimulus duration since the previous
+        minimal_interval = (2 * stim_dur_samp)
+        stim_onsets_idx = self.__require_minimal_interval(stim_onsets_idx, minimal_interval)
+        logger.debug(f'filtered to {len(stim_onsets_idx)} onsets')
+        return stim_onsets_idx
 
-        if len(real_stim_onsets) != self.stim_configs['nsamples']:
-            print("WARNING: found {} stim onsets in block {}, but supposed to have {} samples".format(
-                len(real_stim_onsets), self.block_name, self.stim_configs['nsamples']))
-            
-        return (np.array(real_stim_onsets) / mark_fs) + mark_offset
+    def _get_mark_threshold(self):
+        # ---------------------------------------------------------------------
+        # if 'wn2' in self.stim_configs['name']:
+        #     # for now hard-coding this threshold for WN2 - confirm!
+        #     mark_threshold = 0.1  # arbitrary value, but this seems to work for wn2 (RVG16_B01)
+        #     logger.debug(f'using mark_threshold={mark_threshold} (hard-coded for WN2)')
+        #     return mark_threshold
+        # ---------------------------------------------------------------------
+
+        if self.stim_configs.get('mark_is_stim', False):
+            # NOTE: this is true for stimulus wn1, but not wn2
+            mark_threshold = 0.25  # this value takes priority
+            logger.debug(f'using mark_threshold={mark_threshold} because mark_is_stim=True')
+            return mark_threshold
+
+        # by default use the value in stimulus metadata
+        return super()._get_mark_threshold()
+
+    def __require_minimal_interval(self, stim_onsets_idx, minimal_interval):
+        real_stim_onsets_idx = []
+        prev_onset_i = None
+        for stim_onset_i in stim_onsets_idx:
+            if (prev_onset_i is None) or (stim_onset_i - prev_onset_i > minimal_interval):
+                real_stim_onsets_idx.append(stim_onset_i)
+                prev_onset_i = stim_onset_i
+        return np.array(real_stim_onsets_idx)
+
+    def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
+        # NOTE: stim_vals is not used here
+        num_onsets = len(stim_onsets)
+        num_expected_trials = self.stim_configs['nsamples']
+        mismatch_msg = (
+            f"{self.tokenizer_type}: "
+            + "Incorrect number of stimulus onsets found "
+            + f"in block {self.block_name}. "
+            + f"Expected {num_expected_trials}, found {num_onsets}.")
+
+        if num_onsets != num_expected_trials:
+            # NOTE: BaseTokenizer behavior is to raise a ValueError
+            logger.warning(mismatch_msg)

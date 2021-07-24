@@ -1,19 +1,25 @@
 from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
-from nsds_lab_to_nwb.components.stimulus.mark_tokenizer import MarkTokenizer
+from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
+from nsds_lab_to_nwb.components.stimulus.trials_manager import TrialsManager
 from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
+from nsds_lab_to_nwb.utils import get_stim_lib_path
 
 
 class StimulusOriginator():
     def __init__(self, dataset, metadata):
         self.dataset = dataset
         self.metadata = metadata
+        self.stim_lib_path = get_stim_lib_path(self.dataset.stim_lib_path)
         self.stim_configs = self.metadata['stimulus']
 
+        self.stim_vals = StimValueExtractor(self.stim_configs,
+                                            self.stim_lib_path).extract()
+
         self.mark_manager = MarkManager(self.dataset)
-        self.mark_tokenizer = MarkTokenizer(self.metadata['block_name'],
+        self.trials_manager = TrialsManager(self.metadata['block_name'],
                                             self.stim_configs)
 
-        self.wav_manager = WavManager(self.dataset.stim_lib_path,
+        self.wav_manager = WavManager(self.stim_lib_path,
                                       self.stim_configs)
 
     def make(self, nwb_content):
@@ -23,7 +29,7 @@ class StimulusOriginator():
         nwb_content.add_stimulus(mark_time_series)
 
         # tokenize into trials, once mark track has been added to nwb_content
-        self.mark_tokenizer.tokenize(nwb_content)
+        self.trials_manager.add_trials(nwb_content, self.stim_vals)
 
         # add stimulus WAV data
         stim_starting_time = self._get_stim_starting_time(nwb_content)
@@ -31,7 +37,7 @@ class StimulusOriginator():
         nwb_content.add_stimulus(stim_wav_time_series)
 
     def _get_stim_starting_time(self, nwb_content):
-        if self.mark_tokenizer.tokenizable:
+        if self.trials_manager.tokenizable:
             time_table = nwb_content.trials.to_dataframe().query('sb == "s"')['start_time']
             # first_recorded_mark = time_table[1]  # <<< this was MARS version; legacy from matlab code?
             first_recorded_mark = time_table.values[0]
