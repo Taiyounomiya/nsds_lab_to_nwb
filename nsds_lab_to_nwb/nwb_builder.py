@@ -15,7 +15,7 @@ from nsds_lab_to_nwb.components.neural_data.neural_data_originator import Neural
 from nsds_lab_to_nwb.components.stimulus.stimulus_originator import StimulusOriginator
 from nsds_lab_to_nwb.metadata.metadata_manager import MetadataManager
 from nsds_lab_to_nwb.utils import (get_data_path, get_metadata_lib_path, get_stim_lib_path,
-                                   split_block_folder)
+                                   split_block_folder, get_software_info)
 
 # basicConfig ignored if a filehandler is already set up (as in example scripts)
 logging.basicConfig(stream=sys.stderr)
@@ -76,6 +76,11 @@ class NWBBuilder:
 
         self.bad_block = None
 
+        self.source_script = self._get_source_script()
+
+        logger.info('==================================')
+        logger.info(f'Processing block {block_folder}.')
+
         logger.info('Collecting metadata for NWB conversion...')
         self.metadata = self._collect_nwb_metadata()
         self.experiment_type = self.metadata['experiment_type']
@@ -102,6 +107,17 @@ class NWBBuilder:
 
         logger.info('Extracting session start time...')
         self.session_start_time = self._extract_session_start_time()
+
+    def _get_source_script(self):
+        info = get_software_info()
+        if info['git_branch'] != 'main':
+            warnings.warn(f"You are currently on the {info['git_branch']} branch "
+                          f"of the {info['name']} git repository. " +
+                          "Final NWB files should be created from the main branch.")
+        source_script = (f"Created by nsds-lab-to-nwb {info['version']} "
+                         f"({info['url']}) "
+                         f"(git@{info['git_describe']})")
+        return source_script
 
     def _collect_nwb_metadata(self):
         # collect metadata for NWB conversion
@@ -177,6 +193,7 @@ class NWBBuilder:
             notes=self.metadata.get('notes', None),
             pharmacology=self.metadata.get('pharmacology', None),
             surgery=self.metadata.get('surgery', None),
+            source_script=self.source_script,
         )
 
         logger.info('Adding electrode information...')
@@ -191,6 +208,7 @@ class NWBBuilder:
         else:
             logger.info('Skipping stimulus...')
 
+        logger.info('NWB content built successfully.')
         return nwb_content
 
     def write(self, content):

@@ -1,4 +1,7 @@
 import os
+import subprocess
+
+from nsds_lab_to_nwb import __name__, __url__, __version__
 
 
 error_string = ("{} not set. Add 'export {}=/mypath/folder'"
@@ -114,3 +117,14 @@ def split_block_folder(block_folder):
     else:
         animal_name = f"R{surgeon_initials}{animal_id}"
     return surgeon_initials, animal_name, f"B{block_id}"
+
+
+def get_software_info():
+    software_info = {'name': __name__, 'version': __version__, 'url': __url__}
+    # current git branch
+    software_info['git_branch'] = subprocess.check_output(
+        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], encoding='UTF-8').strip()
+    # either {last_tag}[-{num_additional_commits}-{commit_hash}], or {commit_hash} if no tag
+    software_info['git_describe'] = subprocess.check_output(
+        ['git', 'describe', '--always'], encoding='UTF-8').strip()
+    return software_info
