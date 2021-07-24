@@ -98,10 +98,12 @@ class WNTokenizer(BaseTokenizer):
         # NOTE: stim_vals is not used here
         num_onsets = len(stim_onsets)
         num_expected_trials = self.stim_configs['nsamples']
+        mismatch_msg = (
+            f"{self.tokenizer_type}: "
+            + "Incorrect number of stimulus onsets found "
+            + f"in block {self.block_name}. "
+            + f"Expected {num_expected_trials}, found {num_onsets}.")
+
         if num_onsets != num_expected_trials:
-            # print("WARNING: found {} stim onsets in block {}, but supposed to have {} samples".format(
-            #     len(stim_onsets), self.block_name, self.stim_configs['nsamples']))
-            print(f"[WARNING] {self.tokenizer_type}: "
-                + "Incorrect number of stimulus onsets found "
-                + f"in block {self.block_name}. "
-                + f"Expected {num_expected_trials}, found {num_onsets}.")
+            # NOTE: BaseTokenizer behavior is to raise a ValueError
+            logger.warning(mismatch_msg)

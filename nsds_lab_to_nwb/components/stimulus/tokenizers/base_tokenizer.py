@@ -58,8 +58,11 @@ class BaseTokenizer():
         '''
         num_onsets = len(stim_onsets)
         num_expected_trials = len(stim_vals)
-        assert num_onsets==num_expected_trials, (
+        mismatch_msg = (
             f"{self.tokenizer_type}: "
             + "Incorrect number of stimulus onsets found "
             + f"in block {self.block_name}. "
             + f"Expected {num_expected_trials}, found {num_onsets}.")
+
+        if num_onsets != num_expected_trials:
+            raise ValueError(mismatch_msg)
