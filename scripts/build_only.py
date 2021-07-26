@@ -14,7 +14,6 @@ logging.basicConfig(stream=sys.stderr)
 
 def build_nwb(block_folder,
               save_path='_test/',
-              block_metadata_path=None,
               metadata_save_path='_test/',
               resample_data=False,
               use_htk=False):
@@ -22,14 +21,10 @@ def build_nwb(block_folder,
     Use standard paths. Skip resampling. Intended for testing.
     '''
     # use standard paths
-    data_path = get_data_path()
-    stim_lib_path = get_stim_lib_path()
+    data_path = None
+    stim_lib_path = None
+    block_metadata_path = None
 
-    # assume that metadata yaml file is stored with the data block
-    if block_metadata_path is None:
-        _, animal_name, _ = split_block_folder(block_folder)
-        block_metadata_path = os.path.join(data_path, animal_name, block_folder,
-                                           f"{block_folder}.yaml")
     nwb_builder = NWBBuilder(data_path=data_path,
                              block_folder=block_folder,
                              save_path=save_path,

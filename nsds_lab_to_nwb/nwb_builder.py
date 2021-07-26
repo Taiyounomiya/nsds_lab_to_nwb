@@ -55,7 +55,7 @@ class NWBBuilder:
             data_path: str,
             block_folder: str,
             save_path: str,
-            block_metadata_path: str,
+            block_metadata_path: str = None,
             metadata_lib_path: str = None,
             stim_lib_path: str = None,
             metadata_save_path: str = None,
@@ -68,6 +68,10 @@ class NWBBuilder:
         self.surgeon_initials, self.animal_name, self.block_name = split_block_folder(block_folder)
         self.block_folder = block_folder
         self.save_path = save_path
+
+        if block_metadata_path is None:
+            block_metadata_path = os.path.join(self.data_path, self.animal_name, self.block_folder,
+                                               f"{self.block_folder}.yaml")
         self.block_metadata_path = block_metadata_path
 
         self.metadata_save_path = metadata_save_path
