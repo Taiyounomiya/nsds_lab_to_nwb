@@ -69,7 +69,7 @@ class NWBBuilder:
         self.block_folder = block_folder
         self.save_path = save_path
         self.block_metadata_path = block_metadata_path
-        self.stim_lib_path = stim_lib_path
+
         self.metadata_save_path = metadata_save_path
         self.resample_data = resample_data
         self.use_htk = use_htk
