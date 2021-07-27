@@ -137,8 +137,6 @@ class MetadataReader:
         animal_name_check = f'R{self.surgeon_initials}{int(animal_number):02d}'
         if (animal_number is not None) and (self.animal_name != animal_name_check):
             raise ValueError(f'animal number mismatch: {self.animal_name} vs. {animal_name_check}')
-        if len(experiment_meta) == 0:
-            self.metadata_input.pop('experiment_meta')
 
         # read the clean_block switch
         if 'is_clean_block' in block_meta:
@@ -154,6 +152,11 @@ class MetadataReader:
             device_metadata.pop('Poly')
             block_meta.pop('poly_ap_loc', None)
             block_meta.pop('poly_dev_loc', None)
+
+        # make extra_meta
+        self.metadata_input['extra_meta'] = {}
+        for key in ('block_meta', 'experiment_meta', 'other'):
+            self.metadata_input['extra_meta'].update(self.metadata_input.pop(key, {}))
 
     def __complete_surgery_note(self):
         experiment_meta = self.metadata_input['experiment_meta']
@@ -262,8 +265,11 @@ class LegacyMetadataReader(MetadataReader):
                 raise ValueError('Unexpected filename for HTK mark. Perhaps we should keep this?')
             if self.metadata_input['htk_meta'].pop('audio', _audio) != _audio:
                 raise ValueError('Unexpected filename for HTK audio. Perhaps we should keep this?')
-            if len(self.metadata_input['htk_meta']) == 0:
-                self.metadata_input.pop('htk_meta')
+
+        # make extra_meta
+        self.metadata_input['extra_meta'] = {}
+        for key in ('htk_meta', 'other'):
+            self.metadata_input['extra_meta'].update(self.metadata_input.pop(key, {}))
 
         # final touches...
         if self.experiment_type == 'auditory':
@@ -369,7 +375,7 @@ class MetadataManager:
                     'experiment_description', 'session_description',
                     'subject', 'surgery', 'pharmacology', 'notes',
                     'experiment_meta', 'experiment_type',
-                    'stimulus', 'block_meta',
+                    'stimulus', 'extra_meta',
                     'device'
                     ):
             value = metadata_input.pop(key, None)

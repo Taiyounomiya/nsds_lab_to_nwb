@@ -140,7 +140,7 @@ class NWBBuilder:
 
     def _check_bad_block(self):
         bad_block = False
-        extra_meta = self.metadata.get('block_meta', {})
+        extra_meta = self.metadata.get('extra_meta', {})
         if not str2bool(extra_meta.get('is_clean_block', True)):
             logger.info('* Bad block: experimenter reported clean_block=False')
             bad_block = True
