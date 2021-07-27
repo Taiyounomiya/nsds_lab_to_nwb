@@ -54,7 +54,7 @@ def test_legacy_nwb_builder(tmpdir, block_folder):
     _, animal_name, _ = split_block_folder(block_folder)
     data_path = get_data_path()
     metadata_path = get_metadata_lib_path()
-    block_metadata = os.path.join(metadata_path, "auditory", "yaml", "block",
+    block_metadata = os.path.join(metadata_path, "auditory", "legacy", "yaml", "block",
                                   animal_name, f"{block_folder}.yaml")
 
     nwb_builder = NWBBuilder(
