@@ -76,12 +76,12 @@ keymap:
 
 - name: mark
   comes_from: device
-  mapto: htk_meta.mark_stream
+  mapto: htk_meta.
   description: ''
 
 - name: audio
   comes_from: device
-  mapto: htk_meta.audio_stream
+  mapto: htk_meta.
   description: ''
 
 - name: comment
