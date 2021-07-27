@@ -360,10 +360,8 @@ class MetadataManager:
 
     def __load_stimulus_info(self, stimulus_metadata):
         if stimulus_metadata['name'] is None:
-            # indicates that stimulus is not specified for this block
-            # NWBBuilder will decide what to do in this case
-            logger.info('Unspecified stimulus in metadata.')
-            return
+            # stimulus is not specified for this block - now raise error
+            raise ValueError('Unspecified stimulus name in metadata. Perhaps set to baseline?')
 
         stim_name, _ = check_stimulus_name(stimulus_metadata['name'])
         if stim_name != stimulus_metadata['name']:

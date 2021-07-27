@@ -15,7 +15,7 @@ from nsds_lab_to_nwb.components.neural_data.neural_data_originator import Neural
 from nsds_lab_to_nwb.components.stimulus.stimulus_originator import StimulusOriginator
 from nsds_lab_to_nwb.metadata.metadata_manager import MetadataManager
 from nsds_lab_to_nwb.utils import (get_data_path, get_metadata_lib_path, get_stim_lib_path,
-                                   split_block_folder, get_software_info)
+                                   split_block_folder, get_software_info, str2bool)
 
 # basicConfig ignored if a filehandler is already set up (as in example scripts)
 logging.basicConfig(stream=sys.stderr)
@@ -78,8 +78,6 @@ class NWBBuilder:
         self.resample_data = resample_data
         self.use_htk = use_htk
 
-        self.bad_block = None
-
         self.source_script, self.source_script_file_name = self._get_source_script()
 
         logger.info('==================================')
@@ -88,12 +86,10 @@ class NWBBuilder:
         logger.info('Collecting metadata for NWB conversion...')
         self.metadata = self._collect_nwb_metadata()
         self.experiment_type = self.metadata['experiment_type']
-        if self.metadata['stimulus']['name'] is None:
-            msg = (f'Unspecified stimulus for block {self.block_folder}. ' +
-                   'Stopping NWB conversion for this block.')
-            logger.warn(msg)
-            self.bad_block = True
-            return
+        self.bad_block = self._check_bad_block()
+        if self.bad_block:
+            # optionally force-stop here; for now just continue
+            pass
 
         logger.info('Collecting relevant input data paths...')
         self.dataset = self._collect_dataset_paths()
@@ -133,6 +129,14 @@ class NWBBuilder:
             stim_lib_path=self.stim_lib_path,
             metadata_save_path=self.metadata_save_path)
         return self.metadata_manager.extract_metadata()
+
+    def _check_bad_block(self):
+        bad_block = False
+        extra_meta = self.metadata.get('block_meta', {})
+        if not str2bool(extra_meta.get('is_clean_block', True)):
+            logger.info('* Bad block: experimenter reported clean_block=False')
+            bad_block = True
+        return bad_block
 
     def _collect_dataset_paths(self):
         # scan data_path and identify relevant subdirectories
