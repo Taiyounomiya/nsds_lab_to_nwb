@@ -68,12 +68,7 @@ class NWBBuilder:
         self.surgeon_initials, self.animal_name, self.block_name = split_block_folder(block_folder)
         self.block_folder = block_folder
         self.save_path = save_path
-
-        if block_metadata_path is None:
-            block_metadata_path = os.path.join(self.data_path, self.animal_name, self.block_folder,
-                                               f"{self.block_folder}.yaml")
-        self.block_metadata_path = block_metadata_path
-
+        self.block_metadata_path = self._get_block_metadata_path(block_metadata_path)
         self.metadata_save_path = metadata_save_path
         self.resample_data = resample_data
         self.use_htk = use_htk
@@ -107,6 +102,19 @@ class NWBBuilder:
 
         logger.info('Extracting session start time...')
         self.session_start_time = self._extract_session_start_time()
+
+    def _get_block_metadata_path(self, block_metadata_path):
+        if block_metadata_path is not None:
+            return block_metadata_path
+
+        if self.surgeon_initials is None:
+            # legacy block
+            return os.path.join(self.metadata_lib_path, 'auditory', 'yaml', 'block',
+                                self.animal_name, f'{self.block_folder}.yaml')
+
+        # new block
+        return os.path.join(self.data_path, self.animal_name, self.block_folder,
+                            f"{self.block_folder}.yaml")
 
     def _get_source_script(self):
         info = get_software_info()
