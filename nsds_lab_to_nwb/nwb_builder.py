@@ -109,7 +109,7 @@ class NWBBuilder:
 
         if self.surgeon_initials is None:
             # legacy block
-            return os.path.join(self.metadata_lib_path, 'auditory', 'yaml', 'block',
+            return os.path.join(self.metadata_lib_path, 'auditory', 'legacy', 'yaml', 'block',
                                 self.animal_name, f'{self.block_folder}.yaml')
 
         # new block

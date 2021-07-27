@@ -201,7 +201,7 @@ class LegacyMetadataReader(MetadataReader):
         self.experiment_type = 'auditory'   # for legacy auditory datasets
 
         # TODO: separate (experiment, device) metadata library as legacy
-        self.legacy_lib_path = os.path.join(self.metadata_lib_path, self.experiment_type, 'yaml')
+        self.legacy_lib_path = os.path.join(self.metadata_lib_path, self.experiment_type, 'legacy')
 
     def load_metadata_source(self):
         # direct input from the block yaml file (not yet expanded)
@@ -212,14 +212,14 @@ class LegacyMetadataReader(MetadataReader):
             logger.info(f'expanding {key} from legacy metadata library...')
             filename = metadata_input.pop(key)
             ref_data = read_yaml(
-                os.path.join(self.legacy_lib_path, key, f'{filename}.yaml'))
+                os.path.join(self.legacy_lib_path, 'yaml', key, f'{filename}.yaml'))
             ref_data.pop('name', None)
             metadata_input.update(ref_data)
 
         # also load old experiment notes, if available
         animal_num = int(self.animal_name[1:])  # strip the leading 'R'
         animal_name_fixed = f'R{animal_num:02d}'
-        exp_note_path = os.path.join(self.legacy_lib_path, 'block', 'Experiment_Notes',
+        exp_note_path = os.path.join(self.legacy_lib_path, 'exp_notes',
                                      f'{animal_name_fixed}_exp_note.txt')
         if os.path.exists(exp_note_path):
             # expecting a plain text file; read into a list of strings
@@ -348,7 +348,7 @@ class MetadataManager:
         self.surgeon_initials, self.animal_name, self.block_tag = split_block_folder(block_folder)
         self.metadata_save_path = metadata_save_path
         self.experiment_type = experiment_type
-        self.yaml_lib_path = os.path.join(self.metadata_lib_path, self.experiment_type, 'yaml/')
+        self.yaml_lib_path = os.path.join(self.metadata_lib_path, self.experiment_type)
         self.__detect_legacy_block(legacy_block)
 
         if self.metadata_save_path is not None:
