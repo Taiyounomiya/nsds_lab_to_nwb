@@ -106,9 +106,6 @@ class MetadataReader:
             if 'location' not in device_metadata[key]:
                 # anatomical location in the brain
                 device_metadata[key]['location'] = ''
-            if 'location_details' not in device_metadata[key]:
-                # more quantitative information
-                device_metadata[key]['location_details'] = ''
 
             # required for Electrode component
             if 'imp' not in device_metadata[key]:
@@ -131,20 +128,12 @@ class MetadataReader:
             device_metadata.pop('ECoG')
         if not has_poly:
             device_metadata.pop('Poly')
-
-        # device location metadata
-        if has_ecog:
-            ecog_lat_loc = device_metadata['ECoG'].pop('ecog_lat_loc', None)
-            ecog_post_loc = device_metadata['ECoG'].pop('ecog_post_loc', None)
-            if (ecog_lat_loc is not None) and (ecog_post_loc is not None):
-                device_metadata['ECoG']['location_details'] = (
-                    f'Located {ecog_lat_loc} mm from lateral ridge '
-                    f'and {ecog_post_loc} mm from posterior ridge.')
-        if has_poly:
-            device_metadata['Poly']['location_details'] = 'Located within the ECoG grid.'
+            block_meta.pop('poly_ap_loc', None)
+            block_meta.pop('poly_dev_loc', None)
 
     def __convert_bool(self, s):
         """Convert a True/False text (string) to a boolean value.
+        TODO: merge with the near-duplicate function utils.str2bool
 
         Parameters
         ---------
@@ -393,8 +382,7 @@ class MetadataManager:
                 dev_conf['ch_map'] = ch_map
 
                 # TODO/CONSIDER: apply offset to all poly ch_pos systematically?
-                # (using device_metadata['Poly']['poly_ap_loc']
-                # and device_metadata['Poly']['poly_dev_loc'])
+                # (using metadata 'poly_ap_loc' and 'poly_dev_loc')
 
                 # set up device descriptions;
                 # prepare two versions for device and e-group
@@ -415,7 +403,8 @@ class MetadataManager:
                     location_details += (", ".join([str(ch_map[pn]['electrode_id'])
                                                     for pn in poly_neighbors])).rstrip(', ')
                     location_details += "]. "
-                    dev_conf['location_details'] += location_details
+                else:
+                    location_details = ''
 
                 dev_conf['descriptions'] = {} # ignore existing placeholder text
                 dev_conf['descriptions']['device_description'] = (
@@ -430,7 +419,7 @@ class MetadataManager:
                     f"prefix={dev_conf['prefix']}.")
                 dev_conf['descriptions']['electrode_group_description'] = (
                     f"{basic_description}. "
-                    f"{dev_conf.pop('location_details')}").strip()
+                    f"{location_details}").strip()
 
                 # add device location if not already specified
                 if ('location' not in device_metadata[key] or

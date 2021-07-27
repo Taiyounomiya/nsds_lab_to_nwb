@@ -166,22 +166,22 @@ keymap:
 
 - name: ecog_lat_loc
   comes_from: block_metadata
-  mapto: device.ECoG.
+  mapto: block_meta.
   description: ''
 
 - name: ecog_post_loc
   comes_from: block_metadata
-  mapto: device.ECoG.
+  mapto: block_meta.
   description: ''
 
 - name: poly_ap_loc
   comes_from: block_metadata
-  mapto: device.Poly.
+  mapto: block_meta.
   description: ''
 
 - name: poly_dev_loc
   comes_from: block_metadata
-  mapto: device.Poly.
+  mapto: block_meta.
   description: ''
 
 - name: ecog_bad_chs
