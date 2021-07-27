@@ -80,7 +80,7 @@ class NWBBuilder:
 
         self.bad_block = None
 
-        self.source_script = self._get_source_script()
+        self.source_script, self.source_script_file_name = self._get_source_script()
 
         logger.info('==================================')
         logger.info(f'Processing block {block_folder}.')
@@ -121,7 +121,8 @@ class NWBBuilder:
         source_script = (f"Created by nsds-lab-to-nwb {info['version']} "
                          f"({info['url']}) "
                          f"(git@{info['git_describe']})")
-        return source_script
+        source_script_file_name = 'nsds-lab-to-nwb'  # for now just report the package name
+        return source_script, source_script_file_name
 
     def _collect_nwb_metadata(self):
         # collect metadata for NWB conversion
@@ -198,6 +199,7 @@ class NWBBuilder:
             pharmacology=self.metadata.get('pharmacology', None),
             surgery=self.metadata.get('surgery', None),
             source_script=self.source_script,
+            source_script_file_name=self.source_script_file_name,
         )
 
         logger.info('Adding electrode information...')
