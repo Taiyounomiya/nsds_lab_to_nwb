@@ -81,10 +81,11 @@ class NWBBuilder:
         logger.info('Collecting metadata for NWB conversion...')
         self.metadata = self._collect_nwb_metadata()
         self.experiment_type = self.metadata['experiment_type']
-        self.bad_block = self._check_bad_block()
-        if self.bad_block:
-            # optionally force-stop here; for now just continue
-            pass
+        self.bad_block, incomplete_block = self._check_bad_block()
+        if incomplete_block:
+            self.bad_block = True
+            logger.info('Incomplete block. Escaping __init__ before originators.')
+            return
 
         logger.info('Collecting relevant input data paths...')
         self.dataset = self._collect_dataset_paths()
@@ -140,11 +141,17 @@ class NWBBuilder:
 
     def _check_bad_block(self):
         bad_block = False
+        incomplete_block = False
         extra_meta = self.metadata.get('extra_meta', {})
         if not str2bool(extra_meta.get('is_clean_block', True)):
             logger.info('* Bad block: experimenter reported clean_block=False')
             bad_block = True
-        return bad_block
+        if self.metadata['stimulus']['name'] is None:
+            logger.warning('* Incomplete block: missing stimulus name in metadata.'
+                           'Perhaps use the baseline stimulus?')
+            incomplete_block = True
+
+        return bad_block, incomplete_block
 
     def _collect_dataset_paths(self):
         # scan data_path and identify relevant subdirectories
