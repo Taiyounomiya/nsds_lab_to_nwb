@@ -169,6 +169,13 @@ class NWBBuilder:
         session_start_time = recorded_metadata['start_date']
         return validate_time(session_start_time)
 
+    def _add_extra_metadata(self, nwb_content):
+        # temporary solution: add as scratch data
+        extra_meta = self.metadata['extra_meta']
+        for key, value in extra_meta.items():
+            nwb_content.add_scratch(data=value,
+                                    name=key, notes=f'extra metadata {key}')
+
     def build(self, process_stim=True):
         '''Build NWB file content.
 
@@ -213,6 +220,9 @@ class NWBBuilder:
             source_script=self.source_script,
             source_script_file_name=self.source_script_file_name,
         )
+
+        logger.info('Adding extra metadata items...')
+        self._add_extra_metadata(nwb_content)
 
         logger.info('Adding electrode information...')
         electrode_table_regions = self.electrodes_originator.make(nwb_content)
