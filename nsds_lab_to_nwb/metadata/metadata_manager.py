@@ -215,6 +215,20 @@ class LegacyMetadataReader(MetadataReader):
                 os.path.join(self.legacy_lib_path, key, f'{filename}.yaml'))
             ref_data.pop('name', None)
             metadata_input.update(ref_data)
+
+        # also load old experiment notes, if available
+        animal_num = int(self.animal_name[1:])  # strip the leading 'R'
+        animal_name_fixed = f'R{animal_num:02d}'
+        exp_note_path = os.path.join(self.legacy_lib_path, 'block', 'Experiment_Notes',
+                                     f'{animal_name_fixed}_exp_note.txt')
+        if os.path.exists(exp_note_path):
+            # expecting a plain text file; read into a list of strings
+            with open(exp_note_path) as f:
+                exp_note_input = f.readlines()
+        else:
+            exp_note_input = []
+        metadata_input['exp_note_input'] = exp_note_input
+
         return metadata_input
 
     def parse(self):
@@ -222,8 +236,7 @@ class LegacyMetadataReader(MetadataReader):
                                            keymap_file='metadata_keymap_legacy')
 
     def complete_notes(self):
-        # TODO: read and store old experiment notes
-        pass
+        self.__add_old_experiment_notes()
 
     def extra_cleanup(self):
         # fill in old subject information
@@ -279,6 +292,22 @@ class LegacyMetadataReader(MetadataReader):
             self.metadata_input['session_description'] = (
                 'Auditory experiment with {} stimulus'.format(self.metadata_input['stimulus']['name']))
 
+    def __add_old_experiment_notes(self):
+        notes = self.metadata_input['notes'].strip(' ')
+        if notes == 'TODO':
+            notes = ''  # drop placeholder text
+        if len(notes) > 0:
+            notes += '\n\n'
+
+        # store old experiment notes, for now as-is
+        notes = f'# === Experiment note for {self.animal_name} (all blocks) ==='
+        exp_note_input = self.metadata_input.get('exp_note_input')
+        for row in exp_note_input:
+            row_plain = row.strip(' \n').replace('\t', '..')
+            notes += f'\n{row_plain}'
+
+        self.metadata_input['notes'] = notes
+
 
 class MetadataManager:
     """Manages metadata for NWB file builder
@@ -300,7 +329,7 @@ class MetadataManager:
         Experiment type within the NSDS Lab: 'auditory' (default) or 'behavior'.
     legacy_block : bool (optional)
         Indicates whether this is a legacy block.
-        If not provided, auto-detect by the metadata file extension (CAVEAT: no longer accurate)
+        If not provided, auto-detect by the animal naming scheme.
 
     """
     def __init__(self,
