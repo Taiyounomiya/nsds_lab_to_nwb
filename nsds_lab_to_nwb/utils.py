@@ -128,3 +128,16 @@ def get_software_info():
     software_info['git_describe'] = subprocess.check_output(
         ['git', 'describe', '--always'], encoding='UTF-8').strip()
     return software_info
+
+
+def str2bool(v):
+    '''Parse boolean values from string input.
+    '''
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise ValueError('Boolean value expected.')

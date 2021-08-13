@@ -15,7 +15,7 @@ from nsds_lab_to_nwb.components.neural_data.neural_data_originator import Neural
 from nsds_lab_to_nwb.components.stimulus.stimulus_originator import StimulusOriginator
 from nsds_lab_to_nwb.metadata.metadata_manager import MetadataManager
 from nsds_lab_to_nwb.utils import (get_data_path, get_metadata_lib_path, get_stim_lib_path,
-                                   split_block_folder, get_software_info)
+                                   split_block_folder, get_software_info, str2bool)
 
 # basicConfig ignored if a filehandler is already set up (as in example scripts)
 logging.basicConfig(stream=sys.stderr)
@@ -55,7 +55,7 @@ class NWBBuilder:
             data_path: str,
             block_folder: str,
             save_path: str,
-            block_metadata_path: str,
+            block_metadata_path: str = None,
             metadata_lib_path: str = None,
             stim_lib_path: str = None,
             metadata_save_path: str = None,
@@ -68,15 +68,12 @@ class NWBBuilder:
         self.surgeon_initials, self.animal_name, self.block_name = split_block_folder(block_folder)
         self.block_folder = block_folder
         self.save_path = save_path
-        self.block_metadata_path = block_metadata_path
-        self.stim_lib_path = stim_lib_path
+        self.block_metadata_path = self._get_block_metadata_path(block_metadata_path)
         self.metadata_save_path = metadata_save_path
         self.resample_data = resample_data
         self.use_htk = use_htk
 
-        self.bad_block = None
-
-        self.source_script = self._get_source_script()
+        self.source_script, self.source_script_file_name = self._get_source_script()
 
         logger.info('==================================')
         logger.info(f'Processing block {block_folder}.')
@@ -84,11 +81,10 @@ class NWBBuilder:
         logger.info('Collecting metadata for NWB conversion...')
         self.metadata = self._collect_nwb_metadata()
         self.experiment_type = self.metadata['experiment_type']
-        if self.metadata['stimulus']['name'] is None:
-            msg = (f'Unspecified stimulus for block {self.block_folder}. ' +
-                   'Stopping NWB conversion for this block.')
-            logger.warn(msg)
+        self.bad_block, incomplete_block = self._check_bad_block()
+        if incomplete_block:
             self.bad_block = True
+            logger.info('Incomplete block. Escaping __init__ before originators.')
             return
 
         logger.info('Collecting relevant input data paths...')
@@ -108,6 +104,19 @@ class NWBBuilder:
         logger.info('Extracting session start time...')
         self.session_start_time = self._extract_session_start_time()
 
+    def _get_block_metadata_path(self, block_metadata_path):
+        if block_metadata_path is not None:
+            return block_metadata_path
+
+        if self.surgeon_initials is None:
+            # legacy block
+            return os.path.join(self.metadata_lib_path, 'auditory', 'legacy', 'yaml', 'block',
+                                self.animal_name, f'{self.block_folder}.yaml')
+
+        # new block
+        return os.path.join(self.data_path, self.animal_name, self.block_folder,
+                            f"{self.block_folder}.yaml")
+
     def _get_source_script(self):
         info = get_software_info()
         if info['git_branch'] != 'main':
@@ -117,7 +126,8 @@ class NWBBuilder:
         source_script = (f"Created by nsds-lab-to-nwb {info['version']} "
                          f"({info['url']}) "
                          f"(git@{info['git_describe']})")
-        return source_script
+        source_script_file_name = 'nsds-lab-to-nwb'  # for now just report the package name
+        return source_script, source_script_file_name
 
     def _collect_nwb_metadata(self):
         # collect metadata for NWB conversion
@@ -128,6 +138,20 @@ class NWBBuilder:
             stim_lib_path=self.stim_lib_path,
             metadata_save_path=self.metadata_save_path)
         return self.metadata_manager.extract_metadata()
+
+    def _check_bad_block(self):
+        bad_block = False
+        incomplete_block = False
+        extra_meta = self.metadata.get('extra_meta', {})
+        if not str2bool(extra_meta.get('is_clean_block', True)):
+            logger.info('* Bad block: experimenter reported clean_block=False')
+            bad_block = True
+        if self.metadata['stimulus']['name'] is None:
+            logger.warning('* Incomplete block: missing stimulus name in metadata.'
+                           'Perhaps use the baseline stimulus?')
+            incomplete_block = True
+
+        return bad_block, incomplete_block
 
     def _collect_dataset_paths(self):
         # scan data_path and identify relevant subdirectories
@@ -151,6 +175,13 @@ class NWBBuilder:
         recorded_metadata = self.neural_data_originator.neural_data_reader.tdt_obj['info']
         session_start_time = recorded_metadata['start_date']
         return validate_time(session_start_time)
+
+    def _add_extra_metadata(self, nwb_content):
+        # temporary solution: add as scratch data
+        extra_meta = self.metadata['extra_meta']
+        for key, value in extra_meta.items():
+            nwb_content.add_scratch(data=value,
+                                    name=key, notes=f'extra metadata {key}')
 
     def build(self, process_stim=True):
         '''Build NWB file content.
@@ -194,7 +225,11 @@ class NWBBuilder:
             pharmacology=self.metadata.get('pharmacology', None),
             surgery=self.metadata.get('surgery', None),
             source_script=self.source_script,
+            source_script_file_name=self.source_script_file_name,
         )
+
+        logger.info('Adding extra metadata items...')
+        self._add_extra_metadata(nwb_content)
 
         logger.info('Adding electrode information...')
         electrode_table_regions = self.electrodes_originator.make(nwb_content)

@@ -22,3 +22,9 @@ def validate_time(time_object, timezone=LOCAL_TIMEZONE):
     if not isinstance(time_object, datetime):
         raise TypeError('should be a datetime object.')
     return time_object.astimezone(timezone)
+
+
+def get_date_string_only(datetime_string):
+    # expecting input: '2021-05-25 00:00:00'
+    # output: '2021-05-25'
+    return datetime.fromisoformat(datetime_string).strftime('%Y-%m-%d')

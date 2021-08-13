@@ -54,6 +54,11 @@ keymap:
   mapto: null
   description: ''
 
+- name: exp_note_input
+  comes_from: read from file
+  mapto: null
+  description: old experiment note
+
 - name: surgery
   comes_from: experiment
   mapto: null
@@ -76,12 +81,12 @@ keymap:
 
 - name: mark
   comes_from: device
-  mapto: htk_meta.mark_stream
+  mapto: htk_meta.
   description: ''
 
 - name: audio
   comes_from: device
-  mapto: htk_meta.audio_stream
+  mapto: htk_meta.
   description: ''
 
 - name: comment
