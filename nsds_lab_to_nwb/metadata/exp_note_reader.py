@@ -189,8 +189,7 @@ class ExpNoteReader():
         if write_path is None:
             write_path = self.path
         nsds_meta = self.get_nsds_meta()
-        write_path_file = os.path.join(write_path, self.block_folder + '.yaml')
-        write_yaml(write_path_file, nsds_meta, sort_keys=True)
+        write_yaml(write_path, nsds_meta, sort_keys=True)
 
     def get_nsds_meta(self):
         """Get parsed data
