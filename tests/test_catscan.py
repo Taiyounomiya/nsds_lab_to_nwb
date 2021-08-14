@@ -11,16 +11,19 @@ os.environ['NSDS_STIMULI_PATH'] = '/clusterfs/NSDS_data/stimuli/'
 RESAMPLE_DATA = True
 
 
-@pytest.mark.parametrize("block_folder", [("RVG16_B01"),
-                                          ("RVG16_B02"),
-                                          ("RVG16_B03"),
-                                          ("RVG16_B04"),
-                                          ("RVG16_B05"),
-                                          ("RVG16_B06"),
-                                          ("RVG16_B07"),
-                                          ("RVG16_B08"),
-                                          ("RVG16_B09"),
-                                          ("RVG16_B10")])
+@pytest.mark.parametrize("block_folder", [("RVG16_B01"),  # wn2
+                                          ("RVG16_B02"),  # tone_diagnostic
+                                          ("RVG16_B03"),  # wn2
+                                          ("RVG16_B04"),  # tone_diagnostic
+                                          ("RVG16_B05"),  # tone_diagnostic
+                                          ("RVG16_B06"),  # tone
+                                          ("RVG16_B07"),  # tone150
+                                          ("RVG16_B08"),  # TIMIT, *bad block*
+                                          ("RVG16_B09"),  # no stim, *bad block*
+                                          ("RVG16_B10"),  # dmr
+                                          ("RVG21_B12"),  # baseline stim
+                                          ("RVG21_B13"),  # TIMIT
+                                         ])
 def test_nwb_builder(tmpdir, block_folder):
     """Runs the NWB pipline on a block."""
     if not os.path.isdir(os.environ['NSDS_DATA_PATH']):
