@@ -29,11 +29,29 @@ Also install this package:
 pip install -e .
 ```
 
-Some test scripts also assume that you have cloned the metadata repository:
-(Bouchard lab internal access only)
+### Setting the default paths
 
+It is recommended to set the default data, metadata and stimulus paths
+as the environment variables.
+
+If you are running this on catscan, open your `~/.bashrc` file in any text editor,
+and copy and paste the following lines into the `~/.bashrc` file.
+
+```bash
+export NSDS_METADATA_PATH='/clusterfs/NSDS_data/NSDSLab-NWB-metadata/'
+export NSDS_DATA_PATH='/clusterfs/NSDS_data/raw/'
+export NSDS_STIMULI_PATH='/clusterfs/NSDS_data/stimuli/'
+```
+
+If you are not on catscan, you should make sure that the values of the three environment variables are set correctly, such that the software can find the data, metadata and stimulus files.
+You will need to clone the [NSDSLab-NWB-metadata repository](https://github.com/BouchardLab/NSDSLab-NWB-metadata) and make sure that `NSDS_METADATA_PATH` points to the repository.
+
+<!--
 ```bash
 mkdir -p ~/Src
 cd ~/Src
 git clone git@github.com:BouchardLab/NSDSLab-NWB-metadata.git
 ```
+-->
+
+Also see the [Naming Conventions documentation](https://nsds-lab-to-nwb.readthedocs.io/en/latest/naming_conventions.html) for more information.
