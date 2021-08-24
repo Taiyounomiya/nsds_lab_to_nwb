@@ -180,7 +180,7 @@ class NWBBuilder:
         # temporary solution: add as scratch data
         extra_meta = self.metadata['extra_meta']
         for key, value in extra_meta.items():
-            nwb_content.add_scratch(data=value,
+            nwb_content.add_scratch(data=[value],
                                     name=key, notes=f'extra metadata {key}')
 
     def build(self, process_stim=True):
