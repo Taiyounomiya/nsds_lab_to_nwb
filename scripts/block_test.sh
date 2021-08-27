@@ -9,6 +9,9 @@
 # Or turn off resample_data as well:
 # ./block_test RVG16_B01 --write_nwb False --resample_data False
 #
+# For a quick test run with both write_nwb and resample_data set to False:
+# ./block_test RVG16_B01 --test_run
+#
 # See generate_nwb.py to learn about more input arguments options.
 # -----------------------------------------------------------------
 

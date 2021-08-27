@@ -191,7 +191,7 @@ keymap:
 
 - name: poly_bad_chs
   comes_from: block_metadata
-  mapto: device.ECoG.bad_chs
+  mapto: device.Poly.bad_chs
   description: ''
 
 - name: clean_block

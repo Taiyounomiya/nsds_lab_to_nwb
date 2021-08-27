@@ -57,6 +57,6 @@ tone_diagnostic:
 baseline:
     alt_names: ['Baseline']
     description: 'No stimulus'
-    audio_path: ''
-    marker_path: ''
-    parameter_path: ''
+    audio_path: null
+    marker_path: null
+    parameter_path: null

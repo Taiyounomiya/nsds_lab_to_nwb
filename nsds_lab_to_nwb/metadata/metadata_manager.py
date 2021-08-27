@@ -18,6 +18,7 @@ from nsds_lab_to_nwb.metadata.stim_name_helper import check_stimulus_name
 _DEFAULT_EXPERIMENT_TYPE = 'auditory'
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class MetadataReader:
@@ -102,21 +103,49 @@ class MetadataReader:
 
         device_metadata = self.metadata_input['device']
         for key in ('ECoG', 'Poly'):
+            dev_conf = device_metadata[key]
+
             # required for ElectrodeGroup component - placeholders for now
-            if 'description' not in device_metadata[key]:
-                device_metadata[key]['descriptions'] = {}
-            if 'location' not in device_metadata[key]:
+            if 'description' not in dev_conf:
+                dev_conf['descriptions'] = {}
+            if 'location' not in dev_conf:
                 # anatomical location in the brain
-                device_metadata[key]['location'] = ''
+                dev_conf['location'] = ''
 
             # required for Electrode component
-            if 'imp' not in device_metadata[key]:
+            if 'imp' not in dev_conf:
                 # TODO: include impedance value
-                device_metadata[key]['imp'] = np.nan
-            if 'filtering' not in device_metadata[key]:
-                device_metadata[key]['filtering'] = (
+                dev_conf['imp'] = np.nan
+            if 'filtering' not in dev_conf:
+                dev_conf['filtering'] = (
                     'The signal is low pass filtered at 45 percent of the sample rate, '
                     'and high pass filtered at 2 Hz.')
+
+            # check format of bad_chs
+            if 'bad_chs' in dev_conf:
+                if not isinstance(dev_conf['bad_chs'], list):
+                    input_type = type(dev_conf['bad_chs']).__name__
+                    logger.info(f'Expected a list of channel ids for {key}.bad_chs, '
+                                f'but got {input_type}.')
+                    dev_conf['bad_chs'] = self._fix_bad_chs_format(dev_conf['bad_chs'])
+
+    def _fix_bad_chs_format(self, bad_chs):
+        msg_when_failed = ('Unable to interpret bad_chs as a list. ' +
+                           'Check your metadata input and ' +
+                           'review the yaml syntax for storing a list.')
+
+        if isinstance(bad_chs, str):
+            logger.info(' - Trying to interpret the str...')
+            # assume that this string has a list of integers separated by commas and spaces
+            bad_chs_list_strings = bad_chs.split(', ')
+            try:
+                bad_chs = [int(ch) for ch in bad_chs_list_strings]
+                logger.info(' - Converted to a list of integers.')
+                return bad_chs
+            except ValueError:
+                raise ValueError(msg_when_failed)
+        else:
+            raise TypeError(msg_when_failed)
 
     def complete_notes(self):
         # TODO: store notes for all blocks for this animal, not just this one?
