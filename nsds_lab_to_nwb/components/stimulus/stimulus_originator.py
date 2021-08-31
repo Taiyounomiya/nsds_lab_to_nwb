@@ -34,7 +34,8 @@ class StimulusOriginator():
         # add stimulus WAV data
         stim_starting_time = self._get_stim_starting_time(nwb_content)
         stim_wav_time_series = self.wav_manager.get_stim_wav(starting_time=stim_starting_time)
-        nwb_content.add_stimulus(stim_wav_time_series)
+        if stim_wav_time_series is not None:
+            nwb_content.add_stimulus(stim_wav_time_series)
 
     def _get_stim_starting_time(self, nwb_content):
         if self.trials_manager.tokenizable:
