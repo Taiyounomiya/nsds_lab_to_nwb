@@ -17,8 +17,9 @@ class WavManager():
         self.stim_configs = stim_configs
 
     def get_stim_wav(self, starting_time, name='raw_stimulus'):
-        if self.stim_name in ('wn1', 'baseline'):
-            return None
+        # EDIT NOTE: this check is not necessary because get_stim_file handles missing audio_path
+        # if self.stim_name in ('wn1', 'baseline'):
+        #     return None
 
         stim_file = self.get_stim_file(self.stim_name, self.stim_lib_path)
         if stim_file is None:
