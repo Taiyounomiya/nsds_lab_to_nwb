@@ -56,11 +56,11 @@ class StimulusOriginator():
             nwb_content.add_stimulus(stim_wav_time_series)
 
     def _get_stim_starting_time(self, nwb_content):
-        if self.trials_manager.tokenizable:
+        try:
             time_table = nwb_content.trials.to_dataframe().query('sb == "s"')['start_time']
             first_recorded_mark = time_table.values[0]
-        else:
-            # continuous stimulus
+        except IndexError:
+            # there may be no 's' trial if it was a 'baseline' stimulus block
             first_recorded_mark = 0.0    # see issue #88 for discussion
 
         # starting time for the stimulus TimeSeries

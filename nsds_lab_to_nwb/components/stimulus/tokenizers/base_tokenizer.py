@@ -26,7 +26,8 @@ class BaseTokenizer():
                                     rec_end_time=rec_end_time)
         return trial_list
 
-    def _tokenize(self, mark_time_series, rec_end_time):
+    def _tokenize(self, stim_vals, stim_onsets,
+                  *, stim_dur, bl_start, bl_end, rec_end_time):
         raise NotImplementedError
 
     def get_stim_onsets(self, mark_onsets, mark_time_series):
