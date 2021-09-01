@@ -1,8 +1,12 @@
+import logging
+
 from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
 from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
 from nsds_lab_to_nwb.components.stimulus.trials_manager import TrialsManager
 from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
 from nsds_lab_to_nwb.utils import get_stim_lib_path
+
+logger = logging.getLogger(__name__)
 
 
 class StimulusOriginator():
@@ -23,15 +27,22 @@ class StimulusOriginator():
                                       self.stim_configs)
 
     def make(self, nwb_content):
+        stim_name = self.stim_configs['name']
+        stim_type = self.stim_configs['type']  # either 'discrete' or 'continuous'
+        logger.info(f'Stimulus name: {stim_name} (type: {stim_type})')
+
         # add mark track
+        logger.info('Adding marks...')
         mark_starting_time = 0.0    # <<<< legacy behavior. confirm! always at 0.0?
         mark_time_series = self.mark_manager.get_mark_track(starting_time=mark_starting_time)
         nwb_content.add_stimulus(mark_time_series)
 
         # tokenize into trials, once mark track has been added to nwb_content
+        logger.info('Tokenizing into trials...')
         self.trials_manager.add_trials(nwb_content, self.stim_vals)
 
         # add stimulus WAV data
+        logger.info('Adding stimulus waveform...')
         stim_starting_time = self._get_stim_starting_time(nwb_content)
         stim_wav_time_series = self.wav_manager.get_stim_wav(starting_time=stim_starting_time)
         if stim_wav_time_series is not None:

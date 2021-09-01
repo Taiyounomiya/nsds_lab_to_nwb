@@ -6,6 +6,7 @@ from nsds_lab_to_nwb.tools.tdt.tdt_reader import TDTReader
 from process_nwb.resample import resample
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class NeuralDataOriginator():
@@ -47,11 +48,13 @@ class NeuralDataOriginator():
         rate = self.hardware_rate
         if (rate / 1000 % 1) > 0:
             new_freq = (rate // 1000) * 1000
+            logger.info(f' - resampling from {rate} Hz to {new_freq} Hz')
             new_data = resample(data, new_freq, rate)
             self.resample_rate = new_freq
             return new_data
         else:
             # no need to resample, already at nearest kHz
+            logger.info(f' - already at integer kHz; no need to resample')
             self.resample_flag = False
             return data
 
@@ -67,6 +70,7 @@ class NeuralDataOriginator():
             if isinstance(dev_conf, str): # skip other annotations
                 continue
 
+            logger.info(f'Extracting {device_name} data...')
             data, metadata = self.neural_data_reader.get_data(stream=device_name, dev_conf=dev_conf)
             if data is None:
                 logger.info(f'No data available for {device_name}. Skipping...')
@@ -74,7 +78,9 @@ class NeuralDataOriginator():
                 # resample data
                 self.hardware_rate = metadata['sample_rate']
                 if self.resample_flag:
+                    logger.info('Resampling to the nearest kHz...')
                     data = self.resample(data)
+                    logger.info('Resampling successful.')
 
                 # make description
                 description = self.make_description(device_name)
@@ -92,4 +98,6 @@ class NeuralDataOriginator():
                                             comments=comments,
                                             )
                 logger.info(f'Adding {device_name} data to NWB...')
+                logger.debug(f' - Description: {description}')
+                logger.debug(f' - Comments: {comments}')
                 nwb_content.add_acquisition(e_series)

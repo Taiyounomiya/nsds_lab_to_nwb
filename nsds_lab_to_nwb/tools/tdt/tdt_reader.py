@@ -30,7 +30,7 @@ class TDTReader:
         self.block_name = self.tdt_obj['info']['blockname']
         self.start_time = self.tdt_obj['info']['utc_start_time']
 
-        logger.info('Streams: ' + ', '.join(self.streams))
+        logger.debug('Streams: ' + ', '.join(self.streams))
 
     def get_streams(self):
         """Get TDT all stream names
