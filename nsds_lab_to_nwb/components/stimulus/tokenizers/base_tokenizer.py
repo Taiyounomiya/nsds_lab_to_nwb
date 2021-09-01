@@ -54,6 +54,8 @@ class BaseTokenizer():
         return stim_onsets_idx
 
     def _get_mark_threshold(self):
+        # NOTE: this is only used when TDT-loaded mark onsets are not available.
+        # see issue #102 for more discussion on mark thresholds.
         mark_threshold = self.stim_configs['mark_threshold']
         logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
         return mark_threshold
