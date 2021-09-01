@@ -19,7 +19,11 @@ class MarkManager():
             tdt_reader = TDTReader(self.dataset.tdt_path)
             mark_track, meta = tdt_reader.get_data(stream='mrk1')
             rate = meta['sample_rate']
-            mark_onsets = tdt_reader.get_events()
+            try:
+                mark_onsets = tdt_reader.get_events()
+            except AttributeError:
+                # there is no mark for baseline (no stimulus) block
+                mark_onsets = None
 
         # Create the mark timeseries
         mark_time_series = TimeSeries(name=name,
