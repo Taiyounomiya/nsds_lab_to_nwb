@@ -34,12 +34,12 @@ class StimulusOriginator():
         # add mark track
         logger.info('Adding marks...')
         mark_starting_time = 0.0    # see issue #88 for discussion
-        mark_time_series = self.mark_manager.get_mark_track(starting_time=mark_starting_time)
+        mark_time_series, mark_onsets = self.mark_manager.get_mark_track(starting_time=mark_starting_time)
         nwb_content.add_stimulus(mark_time_series)
 
         # tokenize into trials, once mark track has been added to nwb_content
         logger.info('Tokenizing into trials...')
-        self.trials_manager.add_trials(nwb_content, self.stim_vals)
+        self.trials_manager.add_trials(nwb_content, mark_onsets, self.stim_vals)
 
         # add stimulus WAV data
         logger.info('Adding stimulus waveform...')
