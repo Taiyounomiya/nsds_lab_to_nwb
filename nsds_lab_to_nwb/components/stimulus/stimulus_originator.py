@@ -33,7 +33,7 @@ class StimulusOriginator():
 
         # add mark track
         logger.info('Adding marks...')
-        mark_starting_time = 0.0    # <<<< legacy behavior. confirm! always at 0.0?
+        mark_starting_time = 0.0    # see issue #88 for discussion
         mark_time_series = self.mark_manager.get_mark_track(starting_time=mark_starting_time)
         nwb_content.add_stimulus(mark_time_series)
 
@@ -51,11 +51,10 @@ class StimulusOriginator():
     def _get_stim_starting_time(self, nwb_content):
         if self.trials_manager.tokenizable:
             time_table = nwb_content.trials.to_dataframe().query('sb == "s"')['start_time']
-            # first_recorded_mark = time_table[1]  # <<< this was MARS version; legacy from matlab code?
             first_recorded_mark = time_table.values[0]
         else:
             # continuous stimulus
-            first_recorded_mark = 0.0    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< just a guess. confirm!!!
+            first_recorded_mark = 0.0    # see issue #88 for discussion
 
         # starting time for the stimulus TimeSeries
         stim_starting_time = (first_recorded_mark
