@@ -31,7 +31,7 @@ class TrialsManager():
         if self.custom_trial_columns is None:
             raise ValueError('self.custom_trial_columns should be set by the stim-specific tokenizer.')
 
-    def add_trials(self, nwb_content, mark_onsets, stim_vals, mark_name='recorded_mark'):
+    def add_trials(self, nwb_content, mark_onsets, stim_vals, mark_obj_name='recorded_mark'):
         if not self.tokenizable:
             return
         if self._already_tokenized(nwb_content):
@@ -39,7 +39,7 @@ class TrialsManager():
             return
 
         # tokenize to identify trials
-        mark_time_series = self.read_mark(nwb_content, mark_name=mark_name)
+        mark_time_series = self.read_mark(nwb_content, mark_obj_name)
         trial_list = self.tokenizer.tokenize(mark_onsets, mark_time_series, stim_vals)
 
         # add trial columns, then add trials
@@ -57,5 +57,5 @@ class TrialsManager():
                                     for column_args in self.custom_trial_columns)
         return all(has_custom_trial_columns)
 
-    def read_mark(self, nwb_content, mark_name='recorded_mark'):
-        return nwb_content.stimulus[mark_name]
+    def read_mark(self, nwb_content, mark_obj_name):
+        return nwb_content.stimulus[mark_obj_name]

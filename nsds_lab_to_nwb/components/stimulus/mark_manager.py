@@ -27,6 +27,6 @@ class MarkManager():
                                       unit='Volts',
                                       starting_time=starting_time,
                                       rate=rate,
-                                      description='The stimulus mark track.')
+                                      description='Recorded mark that tracks stimulus onsets.')
 
         return mark_time_series, mark_onsets
