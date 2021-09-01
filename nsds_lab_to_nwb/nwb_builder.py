@@ -2,7 +2,7 @@ import logging.config
 import sys
 import os
 import uuid
-import warnings
+# import warnings
 
 from pynwb import NWBHDF5IO, NWBFile
 from pynwb.file import Subject

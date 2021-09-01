@@ -72,7 +72,7 @@ class NeuralDataOriginator():
             return new_data
         else:
             # no need to resample, already at nearest kHz
-            logger.info(f' - already at integer kHz; no need to resample')
+            logger.info(' - already at integer kHz; no need to resample')
             self.resample_flag = False
             return data
 
