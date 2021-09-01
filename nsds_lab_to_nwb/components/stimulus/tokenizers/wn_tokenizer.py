@@ -37,10 +37,10 @@ class WNTokenizer(BaseTokenizer):
         # trial_list.append(dict(start_time=0.0, stop_time=stim_onsets[0]-stim_dur, sb='b'))
 
         for onset in stim_onsets:
-            trial_list.append(dict(start_time=onset, stop_time=onset+stim_dur, sb='s'))
-            if bl_start==bl_end:
+            trial_list.append(dict(start_time=onset, stop_time=(onset + stim_dur), sb='s'))
+            if bl_start == bl_end:
                 continue
-            trial_list.append(dict(start_time=onset+bl_start, stop_time=onset+bl_end, sb='b'))
+            trial_list.append(dict(start_time=(onset + bl_start), stop_time=(onset + bl_end), sb='b'))
 
         # Add the period after the last stimulus to  baseline
         # trial_list.append(dict(start_time=stim_onsets[-1]+bl_end, stop_time=rec_end_time, sb='b'))

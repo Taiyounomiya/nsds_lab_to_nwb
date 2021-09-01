@@ -1,5 +1,3 @@
-import os
-import numpy as np
 import unittest
 
 from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
@@ -11,8 +9,8 @@ class TestCase_WavManager(unittest.TestCase):
     stim_name = 'White noise'
     stim_path = get_stim_lib_path()
     stim_metadata = {'name': stim_name,
-        'mark_offset': 0, 'first_mark': 0   # dummy values
-        }
+                     'mark_offset': 0, 'first_mark': 0   # dummy values
+                     }
 
     wm = WavManager(stim_path, stim_metadata)
 

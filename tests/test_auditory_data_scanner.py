@@ -1,6 +1,6 @@
 import unittest
 
-from nsds_lab_to_nwb.common.data_scanners import AuditoryDataScanner
+from nsds_lab_to_nwb.common.data_scanners import Dataset, AuditoryDataScanner
 
 
 class TestCase_DataScanning(unittest.TestCase):
@@ -20,6 +20,8 @@ class TestCase_DataScanning(unittest.TestCase):
         # TODO: if there is any error, it should be raised through data_scanner
         # for now no validation is done
         dataset = data_scanner.extract_dataset()
+        if not isinstance(dataset, Dataset):
+            raise TypeError('expecting a custom Dataset object')
 
     def test_auditory_data_scanner_case2_new_data(self):
         ''' scan data_path and identify relevant subdirectories '''
@@ -30,6 +32,9 @@ class TestCase_DataScanning(unittest.TestCase):
         # TODO: if there is any error, it should be raised through data_scanner
         # for now no validation is done
         dataset = data_scanner.extract_dataset()
+        if not isinstance(dataset, Dataset):
+            raise TypeError('expecting a custom Dataset object')
+
 
 if __name__ == '__main__':
     unittest.main()

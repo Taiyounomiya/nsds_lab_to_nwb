@@ -23,7 +23,7 @@ RESAMPLE_DATA = True
                                           ("RVG16_B10"),  # dmr
                                           ("RVG21_B12"),  # baseline stim
                                           ("RVG21_B13"),  # TIMIT
-                                         ])
+                                          ])
 def test_nwb_builder(tmpdir, block_folder):
     """Runs the NWB pipline on a block."""
     if not os.path.isdir(os.environ['NSDS_DATA_PATH']):

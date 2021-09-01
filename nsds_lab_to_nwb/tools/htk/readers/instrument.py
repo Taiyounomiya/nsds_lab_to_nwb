@@ -1,3 +1,12 @@
+import numpy as np
+from .htkcollection import HTKCollection, HTKChannelIterator
+# try:
+#    from scipy.misc import imread
+# except ImportError:
+#     from scipy.ndimage import imread
+from imageio import imread
+from copy import deepcopy
+
 """
 Instrument metadata related classes and functions
 """
@@ -47,15 +56,6 @@ prepare derivative works, incorporate into other computer software, distribute, 
 sublicense such enhancements or derivative works thereof, in binary and source code form.
 """
 
-import numpy as np
-from .htkcollection import HTKCollection, HTKChannelIterator
-# try:
-#    from scipy.misc import imread
-# except ImportError:
-#     from scipy.ndimage import imread
-from imageio import imread
-from copy import deepcopy
-
 
 class EPhysInstrumentData:
     """
@@ -94,7 +94,7 @@ class EPhysInstrumentData:
         self.device_name = device_name
         self.device_image = None
         self.device_image_name = device_image_name
-        self.description=description
+        self.description = description
         self.layout = layout
         self.location = location
         self.htkcollection_kwargs = deepcopy(kwargs)
@@ -156,38 +156,39 @@ class EPhysInstrumentLayout(object):
         """
         if ncols == 3:
             matlab_array = np.asarray([[np.nan, 17, np.nan],
-                                       [10    , 16, 23    ],
-                                       [9     , 18, 24    ],
-                                       [8     , 15, 25    ],
-                                       [7     , 19, 26    ],
-                                       [6     , 14, 27    ],
-                                       [5     , 20, 28    ],
-                                       [4     , 13, 29    ],
-                                       [3     , 21, 30    ],
-                                       [2     , 12, 31    ],
-                                       [1     , 22, 32    ],
+                                       [10, 16, 23],
+                                       [9, 18, 24],
+                                       [8, 15, 25],
+                                       [7, 19, 26],
+                                       [6, 14, 27],
+                                       [5, 20, 28],
+                                       [4, 13, 29],
+                                       [3, 21, 30],
+                                       [2, 12, 31],
+                                       [1, 22, 32],
                                        [np.nan, 11, np.nan],
                                        ])
         elif ncols == 2:
             matlab_array = np.asarray([[20, 18],
-                                   [16, 14],
-                                   [12, 10],
-                                   [8 , 6 ],
-                                   [4 , 2 ],
-                                   [22, 24],
-                                   [26, 28],
-                                   [30, 32],
-                                   [31, 29],
-                                   [27, 25],
-                                   [23, 21],
-                                   [1 , 3 ],
-                                   [5 , 7 ],
-                                   [9 , 11],
-                                   [13, 15],
-                                   [17, 19],])
+                                       [16, 14],
+                                       [12, 10],
+                                       [8, 6],
+                                       [4, 2],
+                                       [22, 24],
+                                       [26, 28],
+                                       [30, 32],
+                                       [31, 29],
+                                       [27, 25],
+                                       [23, 21],
+                                       [1, 3],
+                                       [5, 7],
+                                       [9, 11],
+                                       [13, 15],
+                                       [17, 19],
+                                       ])
         else:
             raise ValueError("Ncols must be one of 2 or 3")
-        python_array = matlab_array-1
+        python_array = matlab_array - 1
         position_array = None
         return python_array, position_array
 
@@ -203,8 +204,8 @@ class EPhysInstrumentLayout(object):
         :return: Two numpy arrays of two floats. The first array is the (x,y) index location in the grid, and the
                  second array is the spatial (x,y) location is the spatial location.
         """
-        index_location = np.asarray([7,0.5])
-        spatial_location = np.asarray([index_location[0]*yspacing, index_location[1]*xspacing])
+        index_location = np.asarray([7, 0.5])
+        spatial_location = np.asarray([index_location[0] * yspacing, index_location[1] * xspacing])
         return index_location, spatial_location
 
     @staticmethod
@@ -221,8 +222,8 @@ class EPhysInstrumentLayout(object):
         """
         if nelect == 64:
             # Grid index
-            matlab_array = np.asarray([[15, 13, 11, 9 , 7 , 5 , 3 , 1 ],
-                                       [16, 14, 12, 10, 8 , 6 , 4 , 2 ],
+            matlab_array = np.asarray([[15, 13, 11, 9, 7, 5, 3, 1],
+                                       [16, 14, 12, 10, 8, 6, 4, 2],
                                        [32, 30, 28, 26, 24, 22, 20, 18],
                                        [31, 29, 27, 25, 23, 21, 19, 17],
                                        [47, 45, 43, 41, 39, 37, 35, 33],
@@ -233,7 +234,7 @@ class EPhysInstrumentLayout(object):
                 pass
             elif orientation == 'S':
                 matlab_array = matlab_array[:, ::-1]
-            python_array = matlab_array-1
+            python_array = matlab_array - 1
 
             # Grid position
             position_array = np.zeros(shape=(8, 8, 2), dtype='float')
@@ -261,7 +262,7 @@ class EPhysInstrumentLayout(object):
                 pass
             elif orientation == 'S':
                 matlab_array = matlab_array[:, ::-1]
-            python_array = matlab_array-1
+            python_array = matlab_array - 1
 
             # Grid position
             position_array = np.zeros(shape=(16, 8, 2), dtype='float')

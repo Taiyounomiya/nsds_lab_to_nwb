@@ -1,21 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from tdt_manager import TdtManager
+from pynwb import NWBHDF5IO
+
+from datetime import datetime
+from dateutil.tz import tzlocal
+from pynwb import NWBFile
+
 """
 Created on Tue Dec  8 20:57:11 2020
 
 @author: jhermiz
 """
 
-from tdt_manager import TdtManager
-from pynwb import NWBHDF5IO
-
-data_directory = '/home/jhermiz/data/hackathon20201201/TTankBackup/R56/R56_B13'    
+data_directory = '/home/jhermiz/data/hackathon20201201/TTankBackup/R56/R56_B13'
 tdt = TdtManager(data_directory, verbose=True)
-
-
-from datetime import datetime
-from dateutil.tz import tzlocal
-from pynwb import NWBFile
 
 nwbfile = NWBFile('my first synthetic recording', 'EXAMPLE_ID', datetime.now(tzlocal()),
                   experimenter='Dr. Bilbo Baggins',
@@ -32,6 +29,7 @@ electrode_group = nwbfile.create_electrode_group(electrode_name,
                                                  description=description,
                                                  location=location,
                                                  device=device)
+
 for idx in [1, 2, 3, 4]:
     nwbfile.add_electrode(id=idx,
                           x=1.0, y=2.0, z=3.0,
@@ -41,8 +39,6 @@ for idx in [1, 2, 3, 4]:
 electrode_table_region = nwbfile.create_electrode_table_region([0, 2], 'the first and third electrodes')
 
 eseries = tdt.extract_tdt('ECoG', None, electrode_table_region)
-
-
 
 nwbfile.add_acquisition(eseries)
 

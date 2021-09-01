@@ -1,3 +1,7 @@
+from struct import unpack
+import numpy as np
+import sys
+
 """
 Module used for reading of htk files.
 """
@@ -46,10 +50,6 @@ license: a  non-exclusive, royalty-free perpetual license to install, use, modif
 prepare derivative works, incorporate into other computer software, distribute, and
 sublicense such enhancements or derivative works thereof, in binary and source code form.
 """
-
-from struct import unpack
-import numpy as np
-import sys
 
 
 class HTKFormat(object):
@@ -316,7 +316,7 @@ class HTKFile(object):
         if self.parameter_kind & HTKFormat.param_kind_encoding['_K']:
             tempdata = tempdata[:-1]
         # Reshape the data to (#vectors, #vector_length
-        outshape = (int(len(tempdata)/self.vector_length), int(self.vector_length))
+        outshape = (int(len(tempdata) / self.vector_length), int(self.vector_length))
         tempdata = tempdata.reshape(outshape)
         if self.__swap_required():
             tempdata = tempdata.byteswap()
