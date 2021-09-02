@@ -24,17 +24,21 @@ class TestCase_StimValueExtractor(unittest.TestCase):
     def test_white_noise_stimuli(self):
         stim_name = 'wn2'
         stim_values = self.__test_stim(stim_name)
+        assert stim_values is not None
 
     def test_tone_stimuli(self):
         stim_name = 'tone'
         stim_values = self.__test_stim(stim_name)
+        assert stim_values is not None
 
         stim_name = 'tone150'
         stim_values = self.__test_stim(stim_name)
+        assert stim_values is not None
 
     def test_timit_stimuli(self):
         stim_name = 'timit'
         stim_values = self.__test_stim(stim_name)
+        assert stim_values is not None
 
     def test_dmr_stimuli(self):
         stim_name = 'dmr'

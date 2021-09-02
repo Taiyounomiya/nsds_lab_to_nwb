@@ -2,6 +2,7 @@ import logging
 import numpy as np
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class ElectrodesOriginator():
@@ -9,8 +10,11 @@ class ElectrodesOriginator():
         self.metadata = metadata
 
     def make(self, nwb_content):
+        logger.info('Creating devices...')
         self.__create_devices(nwb_content)
+        logger.info('Creating electrode groups...')
         self.__create_electrode_groups(nwb_content)
+        logger.info('Creating electrodes...')
         self.__add_electrodes(nwb_content)
         electrode_table_regions = self.__create_electrode_table_regions(nwb_content)
         return electrode_table_regions
@@ -25,6 +29,7 @@ class ElectrodesOriginator():
                 name=device_name,
                 description=dev_conf['descriptions']['device_description'],
                 manufacturer=dev_conf['manufacturer'])
+            logger.debug(f' - Created device {device_name}')
 
     def __create_electrode_groups(self, nwb_content):
         ''' create electrode groups '''
@@ -32,11 +37,16 @@ class ElectrodesOriginator():
             # in our case, only one ElectrodeGroup per device;
             # therefore ElectrodeGroup name is the same as device name
             dev_conf = self.metadata['device'][device_name]
+            description = dev_conf['descriptions']['electrode_group_description']
+            location = dev_conf['location']
             _ = nwb_content.create_electrode_group(
                 name=device_name,
                 device=device,
-                description=dev_conf['descriptions']['electrode_group_description'],
-                location=dev_conf['location'])
+                description=description,
+                location=location)
+            logger.debug(f' - Created an electrode group for device {device_name}')
+            logger.debug(f'   Description: {description}')
+            logger.debug(f'   Location: {location}')
 
     def __add_electrodes(self, nwb_content):
         for device_name in nwb_content.devices:
@@ -56,6 +66,7 @@ class ElectrodesOriginator():
                     imp=dev_conf['imp'],
                     filtering=dev_conf['filtering'],
                     group=e_group)
+            logger.debug(f' - Added all electrodes for electrode group {device_name}')
 
     def __create_electrode_table_regions(self, nwb_content):
         e_regions = {}

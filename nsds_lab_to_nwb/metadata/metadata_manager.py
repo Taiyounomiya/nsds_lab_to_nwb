@@ -117,6 +117,7 @@ class MetadataReader:
                 # TODO: include impedance value
                 dev_conf['imp'] = np.nan
             if 'filtering' not in dev_conf:
+                # see discussion in issue #51
                 dev_conf['filtering'] = (
                     'The signal is low pass filtered at 45 percent of the sample rate, '
                     'and high pass filtered at 2 Hz.')

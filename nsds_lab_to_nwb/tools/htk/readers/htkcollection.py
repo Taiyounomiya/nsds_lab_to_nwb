@@ -1,3 +1,10 @@
+import os
+import warnings
+
+import numpy as np
+
+from .htkfile import HTKFile
+
 """
 Module used for reading of collections of HTK files of raw or processed neural recordings.
 
@@ -47,13 +54,6 @@ license: a  non-exclusive, royalty-free perpetual license to install, use, modif
 prepare derivative works, incorporate into other computer software, distribute, and
 sublicense such enhancements or derivative works thereof, in binary and source code form.
 """
-
-import os
-import warnings
-
-import numpy as np
-
-from .htkfile import HTKFile
 
 
 class HTKCollection(object):
@@ -133,7 +133,8 @@ class HTKCollection(object):
         self.postfix = postfix if postfix is None else postfix
         self.htk_files, self.channel_to_file_map, self.file_to_channel_map = self.__get_htk_files()
         self.data = None
-        self.num_samples, self.sample_period, self.sample_rate, self.sample_size, self.parameter_kind, self.num_bands, self.dtype = self.__get_htk_metadata()
+        (self.num_samples, self.sample_period, self.sample_rate, self.sample_size,
+         self.parameter_kind, self.num_bands, self.dtype) = self.__get_htk_metadata()
         if check_consistency:
             assert self.__check_consistency()
         if layout is None:
@@ -180,7 +181,8 @@ class HTKCollection(object):
                     else:
                         filename_num_bands = None
                     if filename_num_bands != self.num_bands:
-                        warnings.warn('Number of bands in the directory name %i does not match number of bands in files %i.'
+                        warnings.warn(('Number of bands in the directory name %i'
+                                       'does not match number of bands in files %i.')
                                       % (filename_num_bands, self.num_bands))
                     rangestr = splitname[-2].split('to')
                     if len(rangestr) == 2:
@@ -189,8 +191,8 @@ class HTKCollection(object):
                             high_frequency = int(rangestr[1])
                             frequency_range = high_frequency - low_frequency
                             # Linear band stepping
-                            #step = (high_frequency-low_frequency) / float(self.num_bands)
-                            #bands = np.hstack((np.arange(low_frequency, high_frequency, step), high_frequency))
+                            # step = (high_frequency-low_frequency) / float(self.num_bands)
+                            # bands = np.hstack((np.arange(low_frequency, high_frequency, step), high_frequency))
                             # Logarithmic band centers
                             bands = np.logspace(start=0,
                                                 stop=np.log10(frequency_range),
@@ -227,7 +229,7 @@ class HTKCollection(object):
         region_selection = anatomy_mat['anatomy'][0][0]     # Get the dataset with the region selections
         num_regions = len(region_names)                     # Number of regions
         # Compute the dict describing the regions and convert to 0-based index
-        anatomy_dict = {region_names[i]: (region_selection[i].flatten()-1) for i in range(num_regions)}
+        anatomy_dict = {region_names[i]: (region_selection[i].flatten() - 1) for i in range(num_regions)}
         return anatomy_dict
 
     @staticmethod
@@ -239,7 +241,7 @@ class HTKCollection(object):
         """
         import math
         grid_size = int(math.sqrt(num_electrodes))
-        if (grid_size*grid_size) != num_electrodes:
+        if (grid_size * grid_size) != num_electrodes:
             warnings.warn('Default rectangular layout not possible for given HTK collection.')
             return None
         # Create a n x n matrix and roll the axis to get the numbers to be ordered in the columns and then
@@ -321,13 +323,13 @@ class HTKCollection(object):
 
         """
         # Compute the list of all htk files
-        filelist =  [os.path.join(self.directory, filename)      # Record the full path off all htk files
-                        for filename in os.listdir(self.directory)  # Iterate through all files in the directory
-                        if filename.endswith('.htk')]               # Record all HTK files
+        filelist = [os.path.join(self.directory, filename)      # Record the full path off all htk files
+                    for filename in os.listdir(self.directory)  # Iterate through all files in the directory
+                    if filename.endswith('.htk')]               # Record all HTK files
         # print(filelist)
         if self.prefix is not None: # Remove all files from the list that do not have the approbriate prefix
             filelist = [filename for filename in filelist if os.path.basename(filename).startswith(self.prefix)]
-            #print([os.path.basename(filename) for filename in filelist])
+            # print([os.path.basename(filename) for filename in filelist])
         if isinstance(self.postfix, tuple):  # Remove all files that do not have a given postfix
             filelist = [filename for filename in filelist if filename[:-4].endswith(self.postfix)]
             print(filelist)
@@ -343,18 +345,18 @@ class HTKCollection(object):
                         temp_list.append(filename)
             filelist = temp_list
 
-        #Check if we have any files and warn the user if the folder did not contain any valid HTK files
+        # Check if we have any files and warn the user if the folder did not contain any valid HTK files
         if len(filelist) == 0:
             warnings.warn('No HTK files found in the given data directory.')
             return [], np.zeros((0, 0), dtype='uint64'), []
-        #Check if all files in the list have the same size
+        # Check if all files in the list have the same size
         filesizes = np.asarray([os.path.getsize(path) for path in filelist])
         if len(np.unique(filesizes)) != 1:
             raise ValueError('HTK files of varying size found in the same location. Try to set the prefix filter')
 
         # Compute based on the filename the block and channel index
-        blockindex = [-1]*len(filelist)
-        channelindex = [-1]*len(filelist)
+        blockindex = [-1] * len(filelist)
+        channelindex = [-1] * len(filelist)
         for fileindex, filepath in enumerate(filelist):
             blockindex[fileindex], channelindex[fileindex] = self.__get_block_channel_index_from_name(filepath,
                                                                                                       self.noblock)
@@ -368,7 +370,7 @@ class HTKCollection(object):
             numchannels = len(filelist)
             channelindex -= channelindex.min()
 
-        #Sort the files based on their block and channel index
+        # Sort the files based on their block and channel index
         filelist, blockindex, channelindex = self.__sort_files(filelist=filelist,
                                                                blockindex=blockindex,
                                                                channelindex=channelindex,
@@ -381,7 +383,7 @@ class HTKCollection(object):
         # Compute the file to block+channel map
         fmap = list(zip(blockindex, channelindex))
 
-        #Return the filelist and maps
+        # Return the filelist and maps
         return filelist, cbmap, fmap
 
     @staticmethod
@@ -399,8 +401,8 @@ class HTKCollection(object):
         # Compute the sorting index for the files
         fileorder = np.zeros(shape=(len(filelist)), dtype='uint64')
         for fileindex, location in enumerate(zip(blockindex, channelindex)):
-            #Compute the index of the file in the 2D array
-            targetindex = location[0]*numchannels + location[1]
+            # Compute the index of the file in the 2D array
+            targetindex = location[0] * numchannels + location[1]
             fileorder[targetindex] = fileindex
 
         # Reorder the filelist, blocklist and channel list
@@ -425,7 +427,7 @@ class HTKCollection(object):
         :returns: Integer of the block index and integer of the channel index within the block
         """
         basename = os.path.basename(filename).rstrip('.htk')
-        #Get all digits at the end of the filename
+        # Get all digits at the end of the filename
         indexstring = ""
         for endchar in reversed(basename):
             if endchar.isdigit():
@@ -542,39 +544,40 @@ class HTKCollection(object):
                         read progress on screen. 'jupyter' means create a progress bar in a Jupyter notebook.
                         False means, don't show process. Default is False.
         """
-        if print_status == True:
+        if print_status is True:
             import sys
         elif print_status == 'jupyter':
             from bouchardlab.misc.widgets import log_progress
 
         # Read the data from file if we have not done so before
         if self.data is None:
-            #Read all HTK data files in order of appearance in the map
-            #datalist = [None]*len(self.htk_files)
+            # Read all HTK data files in order of appearance in the map
+            # datalist = [None]*len(self.htk_files)
             self.data = np.zeros(shape=self.shape, dtype=self.dtype)
             loop_var = enumerate(self.htk_files)
             if print_status == 'jupyter':
-                loop_var = log_progress(loop_var, every=1, size=len(self.htk_files), name= os.path.basename(self.directory) + ' Channels')
+                loop_var = log_progress(loop_var, every=1, size=len(self.htk_files),
+                                        name=(os.path.basename(self.directory) + ' Channels'))
             for fileindex, filename in loop_var:
                 if print_status is True:
                     sys.stdout.write("Reading HTK Collection: [" +
-                                     str(int(100. * float(fileindex) / float(len(self.htk_files)-1))) +
+                                     str(int(100. * float(fileindex) / float(len(self.htk_files) - 1))) +
                                      "%]" + "\r")
                     sys.stdout.flush()
                 tempfile = HTKFile(filename, sample_rate_base=self.sample_rate_base)
-                #datalist[fileindex] = tempfile.read_data()
+                # datalist[fileindex] = tempfile.read_data()
                 self.data[fileindex] = tempfile.read_data()
                 del tempfile
             if print_status:
                 print('')
-            #Convert the data to numpy and make sure we have a 2D shaped array if we only have one frequency band
-            #self.data = np.asarray(datalist)
+            # Convert the data to numpy and make sure we have a 2D shaped array if we only have one frequency band
+            # self.data = np.asarray(datalist)
         # Return the full data
         return self.data
 
 
 try:
-    #from form.data_utils import DataChunkIterator, DataChunk
+    # from form.data_utils import DataChunkIterator, DataChunk
     from hdmf.data_utils import AbstractDataChunkIterator, DataChunk
     from hdmf.utils import docval, getargs
 
@@ -582,15 +585,15 @@ try:
         """
         Custom data chunk iterator to iterate over the channels of an HTK collection.
         """
-        #@docval({'name': 'data', 'type': HTKCollection, 'doc': 'The HTKCollection to iterate over.'})
+        # @docval({'name': 'data', 'type': HTKCollection, 'doc': 'The HTKCollection to iterate over.'})
         def __init__(self, **kwargs):
             super(HTKChannelIterator, self).__init__()
-            self.data = getargs('data',kwargs)
-            self.__dtype = getargs('dtype',kwargs)
+            self.data = getargs('data', kwargs)
+            self.__dtype = getargs('dtype', kwargs)
             self.current_fileindex = 0
             self.time_axis_first = getargs('time_axis_first', kwargs)
-            self.__maxshape = list(getargs('maxshape',kwargs))
-            self.__has_bands = getargs('has_bands',kwargs)
+            self.__maxshape = list(getargs('maxshape', kwargs))
+            self.__has_bands = getargs('has_bands', kwargs)
             if self.time_axis_first:
                 # Swap the axes on the shape and maxshape
                 self.shape = (self.data.shape[1], self.data.shape[0], self.data.shape[2])
@@ -602,7 +605,6 @@ try:
 
             else:
                 self.shape = self.data.shape
-            
 
         @classmethod
         def from_htk_collection(cls, collection, time_axis_first=False, has_bands=True):
@@ -621,21 +623,21 @@ try:
         @property
         def maxshape(self):
             return self.__maxshape
-        
+
         @property
         def dtype(self):
             return self.__dtype
-        
+
         def __iter__(self):
             """Return the iterator object"""
             return self
-        
+
         def __next__(self):
             """Return the next data chunk or raise a StopIteration exception if all chunks have been retrieved."""
             next_chunk = []
             # Determine the range of channels to be read
             start_index = self.current_fileindex
-            stop_index = start_index + 1 #self.buffer_size
+            stop_index = start_index + 1  # self.buffer_size
             if stop_index > self.data.get_number_of_files():
                 stop_index = self.data.get_number_of_files()
             # Read the data from all current channels
@@ -650,16 +652,16 @@ try:
                 self.current_fileindex = stop_index
                 next_chunk = np.asarray(next_chunk)
                 if self.time_axis_first:
-                    next_chunk = np.swapaxes(next_chunk, 0, 1)     
+                    next_chunk = np.swapaxes(next_chunk, 0, 1)
                 else:
                     next_chunk_location = np.s_[start_index:stop_index, ...]
-                    
+
                 if self.__has_bands:
                     next_chunk_location = np.s_[:, start_index:stop_index, :]
                 else:
                     next_chunk_location = np.s_[:, start_index:stop_index]
-                    next_chunk = next_chunk[:,:,0]
-                #print(next_chunk.shape, next_chunk_location)
+                    next_chunk = next_chunk[:, :, 0]
+                # print(next_chunk.shape, next_chunk_location)
                 return DataChunk(next_chunk, next_chunk_location)
 
         @docval(returns='Tuple with the recommended chunk shape or None if no particular shape is recommended.')
@@ -676,8 +678,6 @@ try:
                 if np.all([i is not None for i in self.__maxshape]):
                     return self.__maxshape
             return self.__first_chunk_shape
-        
-
 
 except ImportError:
     warnings.warn("Could not import hdmf.utils.DataChunkIterator. HTKChannelIterator not available")

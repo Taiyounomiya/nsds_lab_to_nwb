@@ -2,7 +2,7 @@ import logging.config
 import sys
 import os
 import uuid
-import warnings
+# import warnings
 
 from pynwb import NWBHDF5IO, NWBFile
 from pynwb.file import Subject
@@ -119,10 +119,10 @@ class NWBBuilder:
 
     def _get_source_script(self):
         info = get_software_info()
-        if info['git_branch'] != 'main':
-            warnings.warn(f"You are currently on the {info['git_branch']} branch "
-                          f"of the {info['name']} git repository. " +
-                          "Final NWB files should be created from the main branch.")
+        # if info['git_branch'] != 'main':
+        #     warnings.warn(f"You are currently on the {info['git_branch']} branch "
+        #                   f"of the {info['name']} git repository. " +
+        #                   "Final NWB files should be created from the main branch.")
         source_script = (f"Created by nsds-lab-to-nwb {info['version']} "
                          f"({info['url']}) "
                          f"(git@{info['git_describe']})")

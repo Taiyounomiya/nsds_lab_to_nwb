@@ -2,9 +2,7 @@ import os
 import unittest
 
 from nsds_lab_to_nwb.nwb_builder import NWBBuilder
-from nsds_lab_to_nwb.metadata.metadata_manager import MetadataManager
-from nsds_lab_to_nwb.utils import (split_block_folder, get_data_path,
-                                   get_metadata_lib_path, get_stim_lib_path)
+from nsds_lab_to_nwb.utils import split_block_folder, get_data_path
 
 
 class TestCase_Build_NWB(unittest.TestCase):
@@ -34,6 +32,7 @@ class TestCase_Build_NWB(unittest.TestCase):
                                  resample_data=resample_data,
                                  use_htk=use_htk)
         nwb_content = nwb_builder.build()
+        assert nwb_content is not None
 
 
 if __name__ == '__main__':

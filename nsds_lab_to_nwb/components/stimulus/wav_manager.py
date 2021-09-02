@@ -1,6 +1,5 @@
 import logging
 import os
-import numpy as np
 from scipy.io import wavfile
 
 from pynwb import TimeSeries
@@ -9,7 +8,6 @@ from nsds_lab_to_nwb.metadata.stim_name_helper import check_stimulus_name
 from nsds_lab_to_nwb.utils import get_stim_lib_path
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 class WavManager():

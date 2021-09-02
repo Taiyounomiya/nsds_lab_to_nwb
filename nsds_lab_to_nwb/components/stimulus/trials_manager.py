@@ -1,6 +1,10 @@
+import logging
+
 from nsds_lab_to_nwb.components.stimulus.tokenizers.tone_tokenizer import ToneTokenizer
 from nsds_lab_to_nwb.components.stimulus.tokenizers.timit_tokenizer import TIMITTokenizer
 from nsds_lab_to_nwb.components.stimulus.tokenizers.wn_tokenizer import WNTokenizer
+
+logger = logging.getLogger(__name__)
 
 
 class TrialsManager():
@@ -31,7 +35,7 @@ class TrialsManager():
         if not self.tokenizable:
             return
         if self._already_tokenized(nwb_content):
-            print('Block has already been tokenized')
+            logger.info('Block has already been tokenized')
             return
 
         # tokenize to identify trials
