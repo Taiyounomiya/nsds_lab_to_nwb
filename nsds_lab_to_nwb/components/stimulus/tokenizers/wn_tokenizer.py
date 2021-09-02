@@ -68,13 +68,8 @@ class WNTokenizer(BaseTokenizer):
         return stim_onsets_idx
 
     def _get_mark_threshold(self):
-        # ---------------------------------------------------------------------
-        # if 'wn2' in self.stim_configs['name']:
-        #     # for now hard-coding this threshold for WN2 - confirm!
-        #     mark_threshold = 0.1  # arbitrary value, but this seems to work for wn2 (RVG16_B01)
-        #     logger.debug(f'using mark_threshold={mark_threshold} (hard-coded for WN2)')
-        #     return mark_threshold
-        # ---------------------------------------------------------------------
+        # NOTE: this is only used when TDT-loaded mark onsets are not available.
+        # see issue #102 for more discussion on mark thresholds.
 
         if self.stim_configs.get('mark_is_stim', False):
             # NOTE: this is true for stimulus wn1, but not wn2

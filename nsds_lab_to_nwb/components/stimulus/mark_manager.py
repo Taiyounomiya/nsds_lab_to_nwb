@@ -14,9 +14,16 @@ class MarkManager():
             mark_file = HTKFile(self.dataset.htk_mark_path)
             mark_track, meta = mark_file.read_data()
             rate = mark_file.sample_rate
+            mark_onsets = None
         else:
-            mark_track, meta = TDTReader(self.dataset.tdt_path).get_data(stream='mrk1')
+            tdt_reader = TDTReader(self.dataset.tdt_path)
+            mark_track, meta = tdt_reader.get_data(stream='mrk1')
             rate = meta['sample_rate']
+            try:
+                mark_onsets = tdt_reader.get_events()
+            except AttributeError:
+                # there is no mark for baseline (no stimulus) block
+                mark_onsets = None
 
         # Create the mark timeseries
         mark_time_series = TimeSeries(name=name,
@@ -24,5 +31,6 @@ class MarkManager():
                                       unit='Volts',
                                       starting_time=starting_time,
                                       rate=rate,
-                                      description='The stimulus mark track.')
-        return mark_time_series
+                                      description='Recorded mark that tracks stimulus onsets.')
+
+        return mark_time_series, mark_onsets

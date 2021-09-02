@@ -31,6 +31,11 @@ components.stimulus API
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: nsds_lab_to_nwb.components.stimulus.tokenizers.single_tokenizer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. automodule:: nsds_lab_to_nwb.components.stimulus.tokenizers.timit_tokenizer
    :members:
    :undoc-members:

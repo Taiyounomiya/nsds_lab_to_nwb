@@ -47,8 +47,8 @@ def test_nwb_builder(tmpdir, block_folder):
     nwb_builder.write(nwb_content)
 
 
-@pytest.mark.parametrize("block_folder", [("R56_B10"),
-                                          ("R56_B13")])
+@pytest.mark.parametrize("block_folder", [("R56_B10"),      # tone, *legacy block*
+                                          ("R56_B13")])     # wn2, *legacy block*
 def test_legacy_nwb_builder(tmpdir, block_folder):
     """Runs the NWB pipline on a block."""
     if not os.path.isdir(os.environ['NSDS_DATA_PATH']):

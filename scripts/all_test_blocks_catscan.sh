@@ -20,8 +20,8 @@ BLOCK_LIST=("RVG16_B01"  # wn2
             "RVG16_B10"  # dmr
             "RVG21_B12"  # baseline stim
             "RVG21_B13"  # TIMIT
-            "R56_B10"
-            "R56_B13"
+            "R56_B10"    # tone, *legacy block*
+            "R56_B13"    # wn2, *legacy block*
             )
 
 for BLOCK_NAME in "${BLOCK_LIST[@]}"; do

@@ -15,8 +15,8 @@ class BaseTokenizer():
         self.tokenizer_type = 'BaseTokenizer'
         self.custom_trial_columns = None
 
-    def tokenize(self, mark_time_series, stim_vals):
-        stim_onsets = self.get_stim_onsets(mark_time_series)
+    def tokenize(self, mark_onsets, mark_time_series, stim_vals):
+        stim_onsets = self.get_stim_onsets(mark_onsets, mark_time_series)
         self._validate_num_stim_onsets(stim_vals, stim_onsets)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
         trial_list = self._tokenize(stim_vals, stim_onsets,
@@ -26,10 +26,17 @@ class BaseTokenizer():
                                     rec_end_time=rec_end_time)
         return trial_list
 
-    def _tokenize(self, mark_time_series, rec_end_time):
+    def _tokenize(self, stim_vals, stim_onsets,
+                  *, stim_dur, bl_start, bl_end, rec_end_time):
         raise NotImplementedError
 
-    def get_stim_onsets(self, mark_time_series):
+    def get_stim_onsets(self, mark_onsets, mark_time_series):
+        if mark_onsets is not None:
+            # loaded directly from TDT object
+            logger.info('Using stimulus onsets directly loaded from TDT')
+            return mark_onsets
+
+        logger.info('Detecting stimulus onsets by thresholding the mark track')
         mark_fs = mark_time_series.rate
         mark_offset = self.stim_configs['mark_offset']
         mark_threshold = self._get_mark_threshold()
@@ -48,6 +55,8 @@ class BaseTokenizer():
         return stim_onsets_idx
 
     def _get_mark_threshold(self):
+        # NOTE: this is only used when TDT-loaded mark onsets are not available.
+        # see issue #102 for more discussion on mark thresholds.
         mark_threshold = self.stim_configs['mark_threshold']
         logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
         return mark_threshold
