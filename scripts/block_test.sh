@@ -6,8 +6,8 @@
 # To pass extra arguments, for example write_nwb=False:
 # ./block_test RVG16_B01 --write_nwb False
 #
-# Or turn off resample_data as well:
-# ./block_test RVG16_B01 --write_nwb False --resample_data False
+# To turn on resample_data:
+# ./block_test RVG16_B01 --resample_data True
 #
 # For a quick test run with both write_nwb and resample_data set to False:
 # ./block_test RVG16_B01 --test_run

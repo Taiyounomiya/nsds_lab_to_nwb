@@ -59,7 +59,7 @@ class NWBBuilder:
             metadata_lib_path: str = None,
             stim_lib_path: str = None,
             metadata_save_path: str = None,
-            resample_data=True,
+            resample_data=False,
             use_htk=False
     ):
         self.data_path = get_data_path(data_path)

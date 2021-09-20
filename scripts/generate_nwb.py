@@ -27,7 +27,7 @@ if __name__ == '__main__':
                         help='Path to the stimulus library.')
     parser.add_argument('--use_htk', '-k', action='store_true',
                         help='Use data from HTK rather than TDT files.')
-    parser.add_argument('--resample_data', '-r', type=str2bool, default=True,
+    parser.add_argument('--resample_data', '-r', type=str2bool, default=False,
                         help='Resample data to the nearest kHz.')
     parser.add_argument('--write_nwb', '-w', type=str2bool, default=True,
                         help='Write the NWB content to file.')
