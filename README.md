@@ -1,4 +1,4 @@
-# NSDS_lab_to_NWB
+# NSDS-Lab-to-NWB
 
 Python code package to convert NSDS lab data to NWB files.
 
@@ -52,6 +52,15 @@ export NSDS_METADATA_PATH='/clusterfs/NSDS_data/NSDSLab-NWB-metadata/'
 export NSDS_DATA_PATH='/clusterfs/NSDS_data/raw/'
 export NSDS_STIMULI_PATH='/clusterfs/NSDS_data/stimuli/'
 ```
+
+After you edit the `~/.bashrc` file, run
+
+```bash
+source ~/.bashrc
+```
+
+for the change to take effect.
+
 
 If you are not on catscan, you should make sure that the values of the three environment variables are set correctly, such that the software can find the data, metadata and stimulus files.
 You will need to clone the [NSDSLab-NWB-metadata repository](https://github.com/BouchardLab/NSDSLab-NWB-metadata) and make sure that `NSDS_METADATA_PATH` points to the repository.
