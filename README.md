@@ -2,12 +2,21 @@
 
 Python code package to convert NSDS lab data to NWB files.
 
+<!--
 Under development - anything could change.
 
 Metadata library is in a separate repository [NSDSLab-NWB-metadata](https://github.com/BouchardLab/NSDSLab-NWB-metadata) (private to BouchardLab).
+-->
 
 
 ## Setup
+
+### Prerequisite
+
+Make sure that you have conda (either anaconda or miniconda) installed.
+
+
+### Installing this package
 
 Clone this repository and `cd` to the repository root:
 
@@ -17,10 +26,11 @@ git clone git@github.com:BouchardLab/nsds_lab_to_nwb.git
 cd nsds_lab_to_nwb
 ```
 
-Create a conda environment:
+Create a conda environment (named `nsds_nwb` by default), and activate it:
 
 ```bash
 conda env create -f environment.yml
+conda activate nsds_nwb
 ```
 
 Also install this package:
