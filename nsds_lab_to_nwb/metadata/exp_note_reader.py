@@ -6,8 +6,8 @@ from nsds_lab_to_nwb.common.io import write_yaml
 
 # Default metadata values
 defaults = dict()
-defaults['tdt_wave_conversion'] = 1e-6
-defaults['tdt_wave_resolution'] = 1e-6
+defaults['tdt_ecog_conversion'] = 1e-6
+defaults['tdt_ecog_resolution'] = 1e-6
 defaults['tdt_poly_conversion'] = 1.
 defaults['tdt_poly_resolution'] = 1e-7
 
