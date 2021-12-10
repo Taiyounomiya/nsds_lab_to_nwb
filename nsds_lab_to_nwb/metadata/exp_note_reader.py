@@ -4,6 +4,14 @@ from nsds_lab_to_nwb.utils import split_block_folder
 from nsds_lab_to_nwb.common.io import write_yaml
 
 
+# Default metadata values
+defaults = dict()
+defaults['tdt_wave_conversion'] = 1e-6
+defaults['tdt_wave_resolution'] = 1e-6
+defaults['tdt_poly_conversion'] = 1.
+defaults['tdt_poly_resolution'] = 1e-7
+
+
 class ExpNoteReader():
     """Class for parsing experiment notes
 
@@ -176,6 +184,9 @@ class ExpNoteReader():
         meta = self.meta_df.to_dict()
         meta.update(sub_block)
         self.nsds_meta = meta
+        for key in defaults.keys():
+            if key not in self.nsds_meta.keys():
+                self.nsds_meta[key] = defaults[key]
 
     def dump_yaml(self, write_path=None):
         """Dump yaml file
