@@ -193,9 +193,13 @@ class MetadataReader:
         for key in ('block_meta', 'experiment_meta', 'other'):
             self.metadata_input['extra_meta'].update(self.metadata_input.pop(key, {}))
         if block_meta['has_ecog']:
-            self.metadata_input['extra_meta'].update({'ecog_bad_chs': self.metadata_input['device']['ECoG']['bad_chs']})
+            bad_chs = self.metadata_input['device']['ECoG']['bad_chs']
+            if len(bad_chs) > 0:
+                self.metadata_input['extra_meta'].update({'ecog_bad_chs': bad_chs})
         if block_meta['has_poly']:
-            self.metadata_input['extra_meta'].update({'poly_bad_chs': self.metadata_input['device']['Poly']['bad_chs']})
+            bad_chs = self.metadata_input['device']['Poly']['bad_chs']
+            if len(bad_chs) > 0:
+                self.metadata_input['extra_meta'].update({'poly_bad_chs': bad_chs})
 
     def __complete_surgery_note(self):
         experiment_meta = self.metadata_input['experiment_meta']
