@@ -31,8 +31,6 @@ class NeuralDataOriginator():
 
             logger.info(f'Extracting {device_name} data...')
             data, metadata = self.neural_data_reader.get_data(stream=device_name, dev_conf=dev_conf)
-            conversion = f'tdt_{device_name.lower()}_conversion'
-            resolution = f'tdt_{device_name.lower()}_resolution'
             if data is None:
                 logger.info(f'No data available for {device_name}. Skipping...')
             else:
@@ -57,8 +55,8 @@ class NeuralDataOriginator():
                                             rate=self._get_rate(),
                                             description=description,
                                             comments=comments,
-                                            conversion=self.metadata[conversion],
-                                            resolution=self.metadata[resolution]
+                                            conversion=dev_conf.get('conversion', 1.),
+                                            resolution=dev_conf.get('resolution', 1.)
                                             )
                 logger.info(f'Adding {device_name} data to NWB...')
                 logger.debug(f' - Description: {description}')
