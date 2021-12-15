@@ -54,18 +54,20 @@ class StimValueExtractor():
 
 
 def tone_stimulus_values(mat_file_path):
-    ''' adapted from mars.configs.block_directory
+    """adapted from mars.configs.block_directory
 
-    Parameters:
-    -----------
-    mat_file_path: full path to a .mat file that contains stim_values.
+    Parameters
+    ----------
+    mat_file_path : path
+        full path to a .mat file that contains stim_values.
 
-    Returns:
-    --------
-    stim_vals: a 2D array with two columns (NOTE: changed from legacy behavior)
-        stim_vals[:, 0] are the amplitudes,
-        stim_vals[:, 1] are the frequencies of the tones.
-    '''
+    Returns
+    -------
+    stim_vals : ndarray (n, 2)
+        a 2D array with two columns (NOTE: changed from legacy behavior)
+        `stim_vals[:, 0]` are the amplitudes,
+        `stim_vals[:, 1]` are the frequencies of the tones.
+    """
     sio = read_mat_file(mat_file_path)
     stim_vals = sio['stimVls'][:].astype(int)
 
@@ -87,17 +89,17 @@ def tone_stimulus_values(mat_file_path):
 
 
 def timit_stimulus_values(file_path):
-    ''' adapted from mars.configs.block_directory
+    """adapted from mars.configs.block_directory
 
-    Parameters:
+    Parameters
     -----------
-    file_path: full path to a .txt file that contains a list of filenames
+    file_path : full path to a .txt file that contains a list of filenames
 
-    Returns:
+    Returns
     --------
-    stim_vals: a list of strings, where each item is a .wav file name in TIMIT.
-        (should confirm!)
-    '''
+    stim_vals: list of str
+        each item is a .wav file name in TIMIT. (should confirm!)
+    """
     _, ext = os.path.splitext(file_path)
     if not (ext == '.txt'):
         raise ValueError('for now only accepting a txt file that lists wav file names.')
