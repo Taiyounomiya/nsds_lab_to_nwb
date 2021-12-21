@@ -52,8 +52,18 @@ class ElectrodesOriginator():
         for device_name in nwb_content.devices:
             e_group = nwb_content.electrode_groups[device_name]
             dev_conf = self.metadata['device'][device_name]
+
+            # Add column for bad electrodes
+            # Check whether electrodes table has already been made
+            if nwb_content.electrodes is None:
+                bad_desc = 'Whether an electrode was determined to be unusable '\
+                    'during real time data'
+                nwb_content.add_electrode_column('bad', bad_desc)
+
             # Add each electrode
             for _, ch in dev_conf['ch_map'].items():
+                bad_chs = dev_conf['bad_chs']
+                bad_flag = np.isin(ch['electrode_id'], bad_chs)
                 nwb_content.add_electrode(
                     id=ch['electrode_id'],
                     x=np.nan,
@@ -65,7 +75,8 @@ class ElectrodesOriginator():
                     location=dev_conf['location'],
                     imp=dev_conf['imp'],
                     filtering=dev_conf['filtering'],
-                    group=e_group)
+                    group=e_group,
+                    bad=bad_flag)
             logger.debug(f' - Added all electrodes for electrode group {device_name}')
 
     def __create_electrode_table_regions(self, nwb_content):
