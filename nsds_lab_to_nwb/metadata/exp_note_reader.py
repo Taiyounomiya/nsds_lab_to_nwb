@@ -187,7 +187,7 @@ class ExpNoteReader():
             If None writes to self.path
         """
         if write_path is None:
-            write_path = self.path
+            write_path = os.path.join(self.path, self.block_folder + '.yaml')
         nsds_meta = self.get_nsds_meta()
         write_yaml(write_path, nsds_meta, sort_keys=True)
 

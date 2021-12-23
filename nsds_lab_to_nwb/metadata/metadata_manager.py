@@ -24,6 +24,7 @@ logger.setLevel(logging.INFO)
 class MetadataReader:
     ''' Reads metadata input for new experiments.
     '''
+
     def __init__(self,
                  block_metadata_path: str,
                  metadata_lib_path: str,
@@ -145,6 +146,10 @@ class MetadataReader:
                 return bad_chs
             except ValueError:
                 raise ValueError(msg_when_failed)
+        elif np.isnan(bad_chs):
+            bad_chs = []
+            logger.info(' - Converted nan to empty list.')
+            return bad_chs
         else:
             raise TypeError(msg_when_failed)
 
@@ -219,6 +224,7 @@ class MetadataReader:
 class LegacyMetadataReader(MetadataReader):
     ''' Reads metadata input for old experiments.
     '''
+
     def __init__(self,
                  block_metadata_path: str,
                  metadata_lib_path: str,
@@ -362,6 +368,7 @@ class MetadataManager:
         If not provided, auto-detect by the animal naming scheme.
 
     """
+
     def __init__(self,
                  block_metadata_path: str,
                  metadata_lib_path=None,
