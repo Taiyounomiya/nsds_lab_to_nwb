@@ -8,7 +8,7 @@ os.environ['NSDS_DATA_PATH'] = '/clusterfs/NSDS_data/raw/'
 os.environ['NSDS_METADATA_PATH'] = '/clusterfs/NSDS_data/NSDSLab-NWB-metadata/'
 os.environ['NSDS_STIMULI_PATH'] = '/clusterfs/NSDS_data/stimuli/'
 
-RESAMPLE_DATA = True
+RESAMPLE_DATA = False
 
 
 @pytest.mark.parametrize("block_folder", [("RVG16_B01"),  # wn2

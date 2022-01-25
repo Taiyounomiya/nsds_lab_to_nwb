@@ -55,6 +55,8 @@ class NeuralDataOriginator():
                                             rate=self._get_rate(),
                                             description=description,
                                             comments=comments,
+                                            conversion=dev_conf.get('conversion', 1.),
+                                            resolution=dev_conf.get('resolution', 1.)
                                             )
                 logger.info(f'Adding {device_name} data to NWB...')
                 logger.debug(f' - Description: {description}')

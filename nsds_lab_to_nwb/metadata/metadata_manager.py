@@ -16,6 +16,11 @@ from nsds_lab_to_nwb.metadata.stim_name_helper import check_stimulus_name
 
 
 _DEFAULT_EXPERIMENT_TYPE = 'auditory'
+_TDT_ECoG_CONVERSION = '1e-6'
+_TDT_ECoG_RESOLUTION = '1e-6'
+_TDT_Poly_CONVERSION = '1.'
+_TDT_Poly_RESOLUTION = '1e-7'
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -187,6 +192,24 @@ class MetadataReader:
             device_metadata.pop('Poly')
             block_meta.pop('poly_ap_loc', None)
             block_meta.pop('poly_dev_loc', None)
+
+        # Add conversion and resolution defaults if not there
+        if 'ECoG' in device_metadata.keys():
+            d = device_metadata['ECoG']
+            if 'conversion' not in d.keys():
+                if d['acq'] == 'TDT PZM5':
+                    d['conversion'] = _TDT_ECoG_CONVERSION
+            if 'resolution' not in d.keys():
+                if d['acq'] == 'TDT PZM5':
+                    d['resolution'] = _TDT_ECoG_CONVERSION
+        if 'Poly' in device_metadata.keys():
+            d = device_metadata['Poly']
+            if 'conversion' not in d.keys():
+                if d['acq'] == 'TDT PZM5':
+                    d['conversion'] =  _TDT_Poly_CONVERSION
+            if 'resolution' not in d.keys():
+                if d['acq'] == 'TDT PZM5':
+                    d['resolution'] = _TDT_Poly_CONVERSION
 
         # make extra_meta
         self.metadata_input['extra_meta'] = {}
@@ -496,6 +519,12 @@ class MetadataManager:
                 if isinstance(value, str):
                     device_metadata[key] = {'name': value}
                 dev_conf = device_metadata[key]
+                for float_attr in ['resolution', 'conversion']:
+                    try:
+                        dev_conf[float_attr] = float(dev_conf[float_attr])
+                    except KeyError:
+                        pass
+                        
                 probe_path = os.path.join(self.yaml_lib_path, 'probe', dev_conf['name'] + '.yaml')
                 dev_conf.update(read_yaml(probe_path))
 

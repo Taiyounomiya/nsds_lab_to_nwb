@@ -194,6 +194,26 @@ keymap:
   mapto: device.Poly.bad_chs
   description: ''
 
+- name: ecog_conversion
+  comes_from: block_metadata
+  mapto: device.ECoG.conversion
+  description: ''
+
+- name: ecog_resolution
+  comes_from: block_metadata
+  mapto: device.ECoG.resolution
+  description: ''
+
+- name: poly_conversion
+  comes_from: block_metadata
+  mapto: device.Poly.conversion
+  description: ''
+
+- name: poly_resolution
+  comes_from: block_metadata
+  mapto: device.Poly.resolution
+  description: ''
+
 - name: clean_block
   comes_from: block_metadata
   mapto: block_meta.is_clean_block
