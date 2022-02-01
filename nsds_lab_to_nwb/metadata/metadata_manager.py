@@ -143,8 +143,10 @@ class MetadataReader:
 
         if isinstance(bad_chs, str):
             logger.info(' - Trying to interpret the str...')
-            # assume that this string has a list of integers separated by commas and spaces
-            bad_chs_list_strings = bad_chs.split(', ')
+            # assume that this string has a list of integers separated by commas
+            str_split = bad_chs.split(',')
+            # remove spaces between commas
+            bad_chs_list_strings = [x.strip() for x in str_split]
             try:
                 bad_chs = [int(ch) for ch in bad_chs_list_strings]
                 logger.info(' - Converted to a list of integers.')
@@ -206,7 +208,7 @@ class MetadataReader:
             d = device_metadata['Poly']
             if 'conversion' not in d.keys():
                 if d['acq'] == 'TDT PZM5':
-                    d['conversion'] =  _TDT_Poly_CONVERSION
+                    d['conversion'] = _TDT_Poly_CONVERSION
             if 'resolution' not in d.keys():
                 if d['acq'] == 'TDT PZM5':
                     d['resolution'] = _TDT_Poly_CONVERSION
@@ -524,7 +526,7 @@ class MetadataManager:
                         dev_conf[float_attr] = float(dev_conf[float_attr])
                     except KeyError:
                         pass
-                        
+
                 probe_path = os.path.join(self.yaml_lib_path, 'probe', dev_conf['name'] + '.yaml')
                 dev_conf.update(read_yaml(probe_path))
 
