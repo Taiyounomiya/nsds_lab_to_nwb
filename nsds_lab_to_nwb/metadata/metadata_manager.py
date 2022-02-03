@@ -562,12 +562,14 @@ class MetadataManager:
 
                 # keep poly_neighbors, if applicable, after channel remapping
                 poly_neighbors = dev_conf.pop('poly_neighbors', None)
-                if poly_neighbors is not None:
+                if poly_neighbors is not None and isinstance(poly_neighbors, list):
                     # apply ch_map, and flatten to a text description
                     location_details = "poly_neighbors=["
                     location_details += (", ".join([str(ch_map[pn]['electrode_id'])
                                                     for pn in poly_neighbors])).rstrip(', ')
                     location_details += "]. "
+                elif isinstance(poly_neighbors, str):
+                    location_details = poly_neighbors
                 else:
                     location_details = ''
 
