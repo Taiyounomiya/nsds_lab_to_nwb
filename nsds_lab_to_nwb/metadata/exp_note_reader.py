@@ -64,7 +64,7 @@ class ExpNoteReader():
                     no_file_flag = True
 
         if no_file_flag:
-            raise FileNotFoundError
+            raise FileNotFoundError(f'No experimental notes files found in {path}')
 
         self.meta_df = None
         self.block_df = None

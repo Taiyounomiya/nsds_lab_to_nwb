@@ -109,32 +109,33 @@ class MetadataReader:
 
         device_metadata = self.metadata_input['device']
         for key in ('ECoG', 'Poly'):
-            dev_conf = device_metadata[key]
+            if key in device_metadata.keys():
+                dev_conf = device_metadata[key]
 
-            # required for ElectrodeGroup component - placeholders for now
-            if 'description' not in dev_conf:
-                dev_conf['descriptions'] = {}
-            if 'location' not in dev_conf:
-                # anatomical location in the brain
-                dev_conf['location'] = ''
+                # required for ElectrodeGroup component - placeholders for now
+                if 'description' not in dev_conf:
+                    dev_conf['descriptions'] = {}
+                if 'location' not in dev_conf:
+                    # anatomical location in the brain
+                    dev_conf['location'] = ''
 
-            # required for Electrode component
-            if 'imp' not in dev_conf:
-                # TODO: include impedance value
-                dev_conf['imp'] = np.nan
-            if 'filtering' not in dev_conf:
-                # see discussion in issue #51
-                dev_conf['filtering'] = (
-                    'The signal is low pass filtered at 45 percent of the sample rate, '
-                    'and high pass filtered at 2 Hz.')
+                # required for Electrode component
+                if 'imp' not in dev_conf:
+                    # TODO: include impedance value
+                    dev_conf['imp'] = np.nan
+                if 'filtering' not in dev_conf:
+                    # see discussion in issue #51
+                    dev_conf['filtering'] = (
+                        'The signal is low pass filtered at 45 percent of the sample rate, '
+                        'and high pass filtered at 2 Hz.')
 
-            # check format of bad_chs
-            if 'bad_chs' in dev_conf:
-                if not isinstance(dev_conf['bad_chs'], list):
-                    input_type = type(dev_conf['bad_chs']).__name__
-                    logger.info(f'Expected a list of channel ids for {key}.bad_chs, '
-                                f'but got {input_type}.')
-                    dev_conf['bad_chs'] = self._fix_bad_chs_format(dev_conf['bad_chs'])
+                # check format of bad_chs
+                if 'bad_chs' in dev_conf:
+                    if not isinstance(dev_conf['bad_chs'], list):
+                        input_type = type(dev_conf['bad_chs']).__name__
+                        logger.info(f'Expected a list of channel ids for {key}.bad_chs, '
+                                    f'but got {input_type}.')
+                        dev_conf['bad_chs'] = self._fix_bad_chs_format(dev_conf['bad_chs'])
 
     def _fix_bad_chs_format(self, bad_chs):
         msg_when_failed = ('Unable to interpret bad_chs as a list. ' +
@@ -313,7 +314,8 @@ class LegacyMetadataReader(MetadataReader):
         bad_chs_dict = device_metadata.pop('bad_chs', None)
         if bad_chs_dict is not None:
             for dev_name, bad_chs in bad_chs_dict.items():
-                device_metadata[dev_name]['bad_chs'] = bad_chs
+                if dev_name in device_metadata:
+                    device_metadata[dev_name]['bad_chs'] = bad_chs
 
         # data acquisition system
         if 'dac' in self.metadata_input:
@@ -560,12 +562,14 @@ class MetadataManager:
 
                 # keep poly_neighbors, if applicable, after channel remapping
                 poly_neighbors = dev_conf.pop('poly_neighbors', None)
-                if poly_neighbors is not None:
+                if poly_neighbors is not None and isinstance(poly_neighbors, list):
                     # apply ch_map, and flatten to a text description
                     location_details = "poly_neighbors=["
                     location_details += (", ".join([str(ch_map[pn]['electrode_id'])
                                                     for pn in poly_neighbors])).rstrip(', ')
                     location_details += "]. "
+                elif isinstance(poly_neighbors, str):
+                    location_details = poly_neighbors
                 else:
                     location_details = ''
 

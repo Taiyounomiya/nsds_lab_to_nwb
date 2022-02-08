@@ -62,8 +62,11 @@ class ElectrodesOriginator():
 
             # Add each electrode
             for _, ch in dev_conf['ch_map'].items():
-                bad_chs = dev_conf['bad_chs']
-                bad_flag = np.isin(ch['electrode_id'], bad_chs).item()
+                bad_chs = dev_conf.get('bad_chs', None)
+                if bad_chs is None:
+                    bad_flag = False
+                else:
+                    bad_flag = np.isin(ch['electrode_id'], bad_chs).item()
                 nwb_content.add_electrode(
                     id=ch['electrode_id'],
                     x=np.nan,
