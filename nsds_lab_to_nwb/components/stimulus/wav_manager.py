@@ -16,34 +16,32 @@ class WavManager():
         self.stim_lib_path = get_stim_lib_path(stim_lib_path)
         self.stim_configs = stim_configs
 
-    def get_stim_wav(self, starting_time, name='raw_stimulus'):
-        # EDIT NOTE: this check is not necessary because get_stim_file handles missing audio_path
-        # if self.stim_name in ('wn1', 'baseline'):
-        #     return None
+        self.stim_file = self.get_stim_file(self.stim_name, self.stim_lib_path)
+        if self.stim_file is not None:
+            self.stim_wav, self.rate, self.length = self.load_stim_from_wav_file()
 
-        stim_file = self.get_stim_file(self.stim_name, self.stim_lib_path)
-        if stim_file is None:
+    def get_stim_wav(self, starting_time, name='raw_stimulus'):
+        if self.stim_file is None:
             logger.info(f'Stimulus [{self.stim_name}] has no audio file. ' +
                         'No stimulus will be added to the NWB file.')
             return None
 
-        logger.debug(f'Loading stimulus from: {stim_file}')
-        return self._get_stim_wav(stim_file, starting_time, name)
-
-    def _get_stim_wav(self, stim_file, starting_time, name):
-        ''' get the raw wav stimulus track '''
-        # Read the stimulus wav file
-        stim_wav_fs, stim_wav = wavfile.read(stim_file)
-        rate = float(stim_wav_fs)
-
         # Create the stimulus timeseries
         stim_time_series = TimeSeries(name=name,
-                                      data=stim_wav,
+                                      data=self.stim_wav,
                                       starting_time=starting_time,
                                       unit='Volts',
-                                      rate=rate,
+                                      rate=self.rate,
                                       description='Auditory stimulus waveform, aligned to neural recording.')
         return stim_time_series
+
+    def load_stim_from_wav_file(self):
+        # Read the stimulus wav file
+        logger.debug(f'Loading stimulus from: {self.stim_file}')
+        stim_wav_fs, stim_wav = wavfile.read(self.stim_file)
+        rate = float(stim_wav_fs)
+        length = stim_wav.shape[0] / rate
+        return stim_wav, rate, length
 
     @staticmethod
     def get_stim_file(stim_name, stim_path):
