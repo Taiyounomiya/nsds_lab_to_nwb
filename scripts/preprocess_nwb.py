@@ -1,3 +1,6 @@
+#!/user/bin/env python
+import logging.config
+import sys
 import argparse
 import glob
 import os
@@ -26,6 +29,8 @@ if __name__ == '__main__':
     parser.add_argument('--all_filters', action='store_true')
     parser.add_argument('--acq_name', type=str, default='ECoG',
                         help='Name of acquisition in NWB file')
+    parser.add_argument('--display_log', action='store_true',
+                        help='Dislay log to screen, instead of writing to a file.')
 
     args = parser.parse_args()
 
@@ -35,6 +40,14 @@ if __name__ == '__main__':
     filters = args.filters
     hg_only = not args.all_filters
     acq_name = str(args.acq_name)
+
+    # configure logging
+    display_log = args.display_log
+    if display_log:
+        logging.basicConfig(stream=sys.stderr)
+    else:
+        with path(nsds_lab_to_nwb, 'logging.conf') as fname:
+            logging.config.fileConfig(fname, disable_existing_loggers=False)
 
     if target_path.endswith == '.nwb':
         # raise Exception('Please specify the folder CONTAINING the NWB file, not the nwb file itself')

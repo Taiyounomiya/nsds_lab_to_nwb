@@ -42,6 +42,9 @@ def preprocess_block(nwb_path,
     A ProcessingModule with name 'preprocessing' will be added to the NWB.
     '''
     with NWBHDF5IO(nwb_path, 'a') as io:
+        logger.info('==================================')
+        logger.info(f'Running preprocessing for {nwb_path}.')
+
         nwbfile = io.read()
         try:
             electrical_series = nwbfile.acquisition[acq_name]
@@ -52,15 +55,18 @@ def preprocess_block(nwb_path,
         nwbfile.create_processing_module(name='preprocessing',
                                          description='Preprocessing.')
 
+        logger.info(f'Resampling...')
         _, electrical_series_ds = store_resample(electrical_series,
                                                  nwbfile.processing['preprocessing'],
                                                  initial_resample_rate)
         del _
 
+        logger.info(f'Filtering and re-referencing...')
         _, electrical_series_CAR = store_linenoise_notch_CAR(electrical_series_ds,
                                                              nwbfile.processing['preprocessing'])
         del _
 
+        logger.info('Running wavelet transform...')
         _, electrical_series_wvlt = store_wavelet_transform(electrical_series_CAR,
                                                             nwbfile.processing['preprocessing'],
                                                             filters=filters,
@@ -69,3 +75,4 @@ def preprocess_block(nwb_path,
         del _
 
         io.write(nwbfile)
+        logger.info(f'Preprocessing added to {nwb_path}.')
