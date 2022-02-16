@@ -22,7 +22,7 @@ class WNTokenizer(BaseTokenizer):
         self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period')]
 
     def _tokenize(self, stim_vals, stim_onsets,
-                  *, stim_dur, bl_start, bl_end, rec_end_time):
+                  *, stim_dur, bl_start, bl_end, rec_end_time, **unused_metadata):
         """
         (caveat: docstring is outdated)
 

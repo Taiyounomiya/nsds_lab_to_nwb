@@ -20,7 +20,7 @@ class SingleTokenizer(BaseTokenizer):
                                     rec_end_time=rec_end_time)
         return trial_list
 
-    def _tokenize(self, stim_vals, stim_onsets, *, rec_end_time):
+    def _tokenize(self, stim_vals, stim_onsets, *, rec_end_time, **unused_metadata):
         stim_name = self.stim_configs['name']
         if stim_name == 'baseline':
             sb = 'b'
