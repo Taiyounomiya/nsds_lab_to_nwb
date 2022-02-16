@@ -35,14 +35,14 @@ class BaseTokenizer():
         raise NotImplementedError
 
     def get_stim_onsets(self, mark_onsets, mark_time_series):
+        mark_offset = self.stim_configs['mark_offset']
         if mark_onsets is not None:
             # loaded directly from TDT object
             logger.info('Using stimulus onsets directly loaded from TDT')
-            return mark_onsets
+            return mark_onsets + mark_offset
 
         logger.info('Detecting stimulus onsets by thresholding the mark track')
         mark_fs = mark_time_series.rate
-        mark_offset = self.stim_configs['mark_offset']
         mark_threshold = self._get_mark_threshold()
         stim_onsets_idx = self._get_stim_onsets(mark_time_series, mark_threshold)
         stim_onsets = (stim_onsets_idx / mark_fs) + mark_offset
