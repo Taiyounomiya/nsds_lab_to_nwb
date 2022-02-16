@@ -18,26 +18,32 @@ class TIMITTokenizer(BaseTokenizer):
 
     def _tokenize(self, stim_vals, stim_onsets,
                   *, audio_play_length, rec_end_time, **unused_metadata):
+        first_mark = self.stim_configs['first_mark']
+        audio_end_time = (stim_onsets[0] - first_mark) + audio_play_length
+
         trial_list = []
 
         # Add the pre-stimulus period to baseline
         trial_list.append(dict(start_time=0.0,
-                               stop_time=(stim_onsets[0] - stim_dur),
+                               stop_time=stim_onsets[0],
                                sb='b',
-                               sample_filename=stim_vals[0]))
+                               sample_filename='none'))
 
         for i, onset in enumerate(stim_onsets):
             filename = str(stim_vals[i])
+            try:
+                stop_time = stim_onsets[i + 1]
+            except IndexError:
+                stop_time = audio_end_time
             trial_list.append(dict(start_time=onset,
-                                   stop_time=(onset + stim_dur),
+                                   stop_time=stop_time,
                                    sb='s',
                                    sample_filename=filename))
-            # trial_list.append(dict(start_time=onset+bl_start, stop_time=onset+bl_end, sb='b',frq=frq,amp=amp))
 
-        # Add the period after the last stimulus to  baseline
-        trial_list.append(dict(start_time=(stim_onsets[-1] + bl_end),
+        # Add the period after the last stimulus to baseline
+        trial_list.append(dict(start_time=audio_end_time,
                                stop_time=rec_end_time,
                                sb='b',
-                               sample_filename=stim_vals[-1]))
+                               sample_filename='none'))
 
         return trial_list
