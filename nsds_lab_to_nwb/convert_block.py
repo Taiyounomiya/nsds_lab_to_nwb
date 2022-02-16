@@ -18,7 +18,8 @@ def convert_block(block_folder: str,
                   resample_data=True,
                   use_htk=False,
                   process_stim=True,
-                  write_nwb=True):
+                  write_nwb=True,
+                  return_nwb_path=False):
     '''Wrapper for converting a single block of data using NWBBuilder.
     '''
     logger.debug(f'Converting block {block_folder}')
@@ -50,3 +51,6 @@ def convert_block(block_folder: str,
         nwb_builder.write(nwb_content)
     else:
         logger.info('Finishing without writing to a file, because write_nwb is set to False.')
+
+    if return_nwb_path:
+        return nwb_builder.output_file

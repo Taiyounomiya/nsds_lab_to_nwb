@@ -7,6 +7,7 @@ from importlib.resources import path
 import nsds_lab_to_nwb
 from nsds_lab_to_nwb.utils import str2bool
 from nsds_lab_to_nwb.convert_block import convert_block
+from nsds_lab_to_nwb.preprocess_block import preprocess_block
 
 
 if __name__ == '__main__':
@@ -31,6 +32,8 @@ if __name__ == '__main__':
                         help='Resample data to the nearest kHz.')
     parser.add_argument('--write_nwb', '-w', type=str2bool, default=True,
                         help='Write the NWB content to file.')
+    parser.add_argument('--preprocess', '-p', type=str2bool, default=False,
+                        help='Preprocess data and add a ProcessingModule to NWB.')
     parser.add_argument('--display_log', action='store_true',
                         help='Dislay log to screen, instead of writing to a file.')
     parser.add_argument('--test_run', action='store_true',
@@ -51,6 +54,7 @@ if __name__ == '__main__':
     use_htk = args.use_htk
     resample_data = args.resample_data
     write_nwb = args.write_nwb
+    preprocess = args.preprocess
 
     # switches for testing interface
     display_log = args.display_log
@@ -73,13 +77,18 @@ if __name__ == '__main__':
         else:
             save_path = '_test/'
 
-    convert_block(block_folder=block_folder,
-                  save_path=save_path,
-                  data_path=data_path,
-                  stim_lib_path=stim_lib_path,
-                  metadata_lib_path=metadata_lib_path,
-                  block_metadata_path=block_metadata_path,
-                  metadata_save_path=metadata_save_path,
-                  use_htk=use_htk,
-                  resample_data=resample_data,
-                  write_nwb=write_nwb)
+    nwb_path = convert_block(block_folder=block_folder,
+                             save_path=save_path,
+                             data_path=data_path,
+                             stim_lib_path=stim_lib_path,
+                             metadata_lib_path=metadata_lib_path,
+                             block_metadata_path=block_metadata_path,
+                             metadata_save_path=metadata_save_path,
+                             use_htk=use_htk,
+                             resample_data=resample_data,
+                             write_nwb=write_nwb,
+                             return_nwb_path=True)
+
+    if preprocess:
+        # use default parameters for preprocessing
+        preprocess_block(nwb_path, acq_name='ECoG')
