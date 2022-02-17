@@ -26,7 +26,10 @@ if __name__ == '__main__':
     parser.add_argument('--filters', type=str, default='rat',
                         choices=['rat', 'human', 'changlab'],
                         help='Type of filter bank to use for wavelets.')
-    parser.add_argument('--all_filters', action='store_true')
+    parser.add_argument('--all_filters', action='store_true',
+                        help='Store all filters rather than only HG.')
+    parser.add_argument('--all_steps', action='store_true',
+                        help='Store output from all preprocessing steps')
     parser.add_argument('--acq_name', type=str, default='ECoG',
                         help='Name of acquisition in NWB file')
     parser.add_argument('--display_log', action='store_true',
@@ -39,6 +42,7 @@ if __name__ == '__main__':
     final_resample_rate = args.final_resample_rate
     filters = args.filters
     hg_only = not args.all_filters
+    all_steps = args.all_steps
     acq_name = str(args.acq_name)
 
     # configure logging
