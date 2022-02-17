@@ -7,7 +7,6 @@ from importlib.resources import path
 import nsds_lab_to_nwb
 from nsds_lab_to_nwb.utils import str2bool
 from nsds_lab_to_nwb.convert_block import convert_block
-from nsds_lab_to_nwb.preprocess_block import preprocess_block
 
 
 if __name__ == '__main__':
@@ -54,7 +53,7 @@ if __name__ == '__main__':
     use_htk = args.use_htk
     resample_data = args.resample_data
     write_nwb = args.write_nwb
-    preprocess = args.preprocess
+    add_preprocessing = args.preprocess
 
     # switches for testing interface
     display_log = args.display_log
@@ -77,18 +76,14 @@ if __name__ == '__main__':
         else:
             save_path = '_test/'
 
-    nwb_path = convert_block(block_folder=block_folder,
-                             save_path=save_path,
-                             data_path=data_path,
-                             stim_lib_path=stim_lib_path,
-                             metadata_lib_path=metadata_lib_path,
-                             block_metadata_path=block_metadata_path,
-                             metadata_save_path=metadata_save_path,
-                             use_htk=use_htk,
-                             resample_data=resample_data,
-                             write_nwb=write_nwb,
-                             return_nwb_path=True)
-
-    if preprocess:
-        # use default parameters for preprocessing
-        preprocess_block(nwb_path, acq_name='ECoG')
+    convert_block(block_folder=block_folder,
+                  save_path=save_path,
+                  data_path=data_path,
+                  stim_lib_path=stim_lib_path,
+                  metadata_lib_path=metadata_lib_path,
+                  block_metadata_path=block_metadata_path,
+                  metadata_save_path=metadata_save_path,
+                  use_htk=use_htk,
+                  resample_data=resample_data,
+                  write_nwb=write_nwb,
+                  add_preprocessing=add_preprocessing)

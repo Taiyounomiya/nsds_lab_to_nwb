@@ -1,11 +1,18 @@
 import logging.config
 
+from process_nwb import preprocess_block
+
 from nsds_lab_to_nwb.utils import (get_data_path, get_metadata_lib_path,
                                    get_stim_lib_path)
 from nsds_lab_to_nwb.nwb_builder import NWBBuilder
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+DEFAULT_PREPROCESSIONG_KWARGS = {
+    'initial_resample_rate': 3200., 'final_resample_rate': 400.,
+    'filters': 'rat', 'hg_only': True}
 
 
 def convert_block(block_folder: str,
@@ -19,7 +26,7 @@ def convert_block(block_folder: str,
                   use_htk=False,
                   process_stim=True,
                   write_nwb=True,
-                  return_nwb_path=False):
+                  add_preprocessing=False):
     '''Wrapper for converting a single block of data using NWBBuilder.
     '''
     logger.debug(f'Converting block {block_folder}')
@@ -52,5 +59,9 @@ def convert_block(block_folder: str,
     else:
         logger.info('Finishing without writing to a file, because write_nwb is set to False.')
 
-    if return_nwb_path:
-        return nwb_builder.output_file
+    if add_preprocessing:
+        # use default parameters for preprocessing
+        preprocess_block(nwb_builder.output_file,
+                         acq_name='ECoG',   # for now ecog only?
+                         **DEFAULT_PREPROCESSIONG_KWARGS,
+                         logger=logger)
