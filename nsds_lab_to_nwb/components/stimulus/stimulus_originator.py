@@ -20,11 +20,14 @@ class StimulusOriginator():
                                             self.stim_lib_path).extract()
 
         self.mark_manager = MarkManager(self.dataset)
-        self.trials_manager = TrialsManager(self.metadata['block_name'],
-                                            self.stim_configs)
-
         self.wav_manager = WavManager(self.stim_lib_path,
                                       self.stim_configs)
+
+        # TODO: store play_length as part of stimulus metadata yaml?
+        self.stim_configs['play_length'] = self.wav_manager.length
+
+        self.trials_manager = TrialsManager(self.metadata['block_name'],
+                                            self.stim_configs)
 
         # names for mark and stimulus time series objects
         self.mark_obj_name = 'stim_onset_marks'  # 'recorded_mark' (previous name)
@@ -45,7 +48,6 @@ class StimulusOriginator():
         # tokenize into trials, once mark track has been added to nwb_content
         logger.info('Tokenizing into trials...')
         self.trials_manager.add_trials(nwb_content, mark_events, self.stim_vals,
-                                       audio_play_length=self.wav_manager.length,
                                        mark_obj_name=self.mark_obj_name)
 
         # add stimulus WAV data

@@ -15,10 +15,7 @@ class BaseTokenizer():
         self.tokenizer_type = 'BaseTokenizer'
         self.custom_trial_columns = None
 
-    def tokenize(self, mark_events, mark_time_series, stim_vals,
-                 audio_play_length=None):
-        ''' audio_play_length: length of raw audio file. added for TIMIT
-        '''
+    def tokenize(self, mark_events, mark_time_series, stim_vals):
         stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
         self._validate_num_stim_onsets(stim_vals, stim_onsets)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
@@ -26,7 +23,7 @@ class BaseTokenizer():
                                     stim_dur=self.stim_configs['duration'],
                                     bl_start=self.stim_configs['baseline_start'],
                                     bl_end=self.stim_configs['baseline_end'],
-                                    audio_play_length=audio_play_length,
+                                    audio_play_length=self.stim_configs['play_length'],
                                     rec_end_time=rec_end_time)
         return trial_list
 
