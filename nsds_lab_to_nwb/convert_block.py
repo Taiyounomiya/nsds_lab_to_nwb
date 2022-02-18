@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-DEFAULT_PREPROCESSIONG_KWARGS = {
+DEFAULT_PREPROCESSING_KWARGS = {
     'initial_resample_rate': 3200., 'final_resample_rate': 400.,
     'filters': 'rat', 'hg_only': True}
 
@@ -63,5 +63,5 @@ def convert_block(block_folder: str,
         # use default parameters for preprocessing
         preprocess_block(nwb_builder.output_file,
                          acq_name='ECoG',   # for now ecog only?
-                         **DEFAULT_PREPROCESSIONG_KWARGS,
+                         **DEFAULT_PREPROCESSING_KWARGS,
                          logger=logger)
