@@ -31,6 +31,8 @@ if __name__ == '__main__':
                         help='Resample data to the nearest kHz.')
     parser.add_argument('--write_nwb', '-w', type=str2bool, default=True,
                         help='Write the NWB content to file.')
+    parser.add_argument('--preprocess', '-p', type=str2bool, default=False,
+                        help='Preprocess data and add a ProcessingModule to NWB.')
     parser.add_argument('--display_log', action='store_true',
                         help='Dislay log to screen, instead of writing to a file.')
     parser.add_argument('--test_run', action='store_true',
@@ -51,6 +53,7 @@ if __name__ == '__main__':
     use_htk = args.use_htk
     resample_data = args.resample_data
     write_nwb = args.write_nwb
+    add_preprocessing = args.preprocess
 
     # switches for testing interface
     display_log = args.display_log
@@ -82,4 +85,5 @@ if __name__ == '__main__':
                   metadata_save_path=metadata_save_path,
                   use_htk=use_htk,
                   resample_data=resample_data,
-                  write_nwb=write_nwb)
+                  write_nwb=write_nwb,
+                  add_preprocessing=add_preprocessing)

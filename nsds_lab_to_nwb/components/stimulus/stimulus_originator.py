@@ -45,6 +45,7 @@ class StimulusOriginator():
         # tokenize into trials, once mark track has been added to nwb_content
         logger.info('Tokenizing into trials...')
         self.trials_manager.add_trials(nwb_content, mark_onsets, self.stim_vals,
+                                       audio_play_length=self.wav_manager.length,
                                        mark_obj_name=self.mark_obj_name)
 
         # add stimulus WAV data

@@ -106,7 +106,8 @@ def timit_stimulus_values(file_path):
 
     # expecting a text file, one .wav filename string per row
     with open(file_path) as f:
-        stim_vals = f.readlines()
+        lines = f.readlines()
+    stim_vals = [line.rstrip(' \n') for line in lines]
     return stim_vals
 
 
