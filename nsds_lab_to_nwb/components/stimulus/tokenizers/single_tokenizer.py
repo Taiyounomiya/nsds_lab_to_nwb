@@ -1,4 +1,9 @@
+import logging
+
 from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTokenizer
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class SingleTokenizer(BaseTokenizer):
@@ -43,6 +48,13 @@ class SingleTokenizer(BaseTokenizer):
         first_mark = self.stim_configs['first_mark']
         audio_start_time = stim_start_time - first_mark
         audio_end_time = audio_start_time + audio_play_length
+
+        stim_name = self.stim_configs['name']
+        logger.debug(f'Tokenizing {stim_name} stimulus.')
+        logger.debug(f'audio file start time: {audio_start_time}')
+        logger.debug(f'stim onset: {stim_start_time}')
+        logger.debug(f'audio file end time: {audio_end_time} ')
+        logger.debug(f'recording end time: {rec_end_time}')
 
         trial_list = []
 
