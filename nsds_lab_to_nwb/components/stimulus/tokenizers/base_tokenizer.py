@@ -15,11 +15,11 @@ class BaseTokenizer():
         self.tokenizer_type = 'BaseTokenizer'
         self.custom_trial_columns = None
 
-    def tokenize(self, mark_onsets, mark_time_series, stim_vals,
+    def tokenize(self, mark_events, mark_time_series, stim_vals,
                  audio_play_length=None):
         ''' audio_play_length: length of raw audio file. added for TIMIT
         '''
-        stim_onsets = self.get_stim_onsets(mark_onsets, mark_time_series)
+        stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
         self._validate_num_stim_onsets(stim_vals, stim_onsets)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
         trial_list = self._tokenize(stim_vals, stim_onsets,
@@ -34,12 +34,12 @@ class BaseTokenizer():
                   *, stim_dur, bl_start, bl_end, rec_end_time):
         raise NotImplementedError
 
-    def get_stim_onsets(self, mark_onsets, mark_time_series):
+    def get_stim_onsets(self, mark_events, mark_time_series):
         mark_offset = self.stim_configs['mark_offset']
-        if mark_onsets is not None:
+        if mark_events is not None:
             # loaded directly from TDT object
-            logger.info('Using stimulus onsets directly loaded from TDT')
-            return mark_onsets + mark_offset
+            logger.info('Using marker events directly loaded from TDT')
+            return mark_events + mark_offset
 
         logger.info('Detecting stimulus onsets by thresholding the mark track')
         mark_fs = mark_time_series.rate

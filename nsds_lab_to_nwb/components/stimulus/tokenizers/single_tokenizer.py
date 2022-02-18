@@ -13,11 +13,10 @@ class SingleTokenizer(BaseTokenizer):
         self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                                      ('stim_name', 'Stimulus name')]
 
-    def tokenize(self, mark_onsets, mark_time_series, stim_vals,
+    def tokenize(self, mark_events, mark_time_series, stim_vals,
                  audio_play_length):
-        # stim_onsets = None  # not needed in this case
-        # EDIT: in the continuous case, just looking for the *first* stim onset
-        stim_onsets = self.get_stim_onsets(mark_onsets, mark_time_series)
+        # in the continuous case, just looking for the *first* stim onset
+        stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
         trial_list = self._tokenize(stim_vals, stim_onsets,
                                     rec_end_time=rec_end_time,
