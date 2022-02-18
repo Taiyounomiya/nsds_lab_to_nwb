@@ -40,7 +40,7 @@ docs/source/gen_modules/*
 *.log
 
 # test output
-_test
+_test*
 
 # space for users to save custom scripts
 scripts/user/*
