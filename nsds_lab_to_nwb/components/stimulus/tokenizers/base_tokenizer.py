@@ -2,7 +2,7 @@ import logging
 import numpy as np
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 
 
 class BaseTokenizer():
@@ -19,11 +19,21 @@ class BaseTokenizer():
         stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
         self._validate_num_stim_onsets(stim_vals, stim_onsets)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
+
+        stim_start_time = stim_onsets[0]
+        audio_start_time = stim_start_time - self.stim_configs['first_mark']
+        audio_end_time = audio_start_time + self.stim_configs['play_length']
+
+        stim_name = self.stim_configs['name']
+        logger.debug(f'Tokenizing {stim_name} stimulus.')
+        logger.debug(f'audio file start time: {audio_start_time}')
+        logger.debug(f'stim onset: {stim_start_time}')
+        logger.debug(f'audio file end time: {audio_end_time} ')
+        logger.debug(f'recording end time: {rec_end_time}')
+
         trial_list = self._tokenize(stim_vals, stim_onsets,
-                                    stim_dur=self.stim_configs['duration'],
-                                    bl_start=self.stim_configs['baseline_start'],
-                                    bl_end=self.stim_configs['baseline_end'],
-                                    audio_play_length=self.stim_configs['play_length'],
+                                    audio_start_time=audio_start_time,
+                                    audio_end_time=audio_end_time,
                                     rec_end_time=rec_end_time)
         return trial_list
 

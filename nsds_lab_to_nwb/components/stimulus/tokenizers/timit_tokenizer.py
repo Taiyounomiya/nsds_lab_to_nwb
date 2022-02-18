@@ -17,10 +17,7 @@ class TIMITTokenizer(BaseTokenizer):
                                      ('sample_filename', 'Sample Filename')]
 
     def _tokenize(self, stim_vals, stim_onsets,
-                  *, audio_play_length, rec_end_time, **unused_metadata):
-        first_mark = self.stim_configs['first_mark']
-        audio_end_time = (stim_onsets[0] - first_mark) + audio_play_length
-
+                  *, audio_start_time, audio_end_time, rec_end_time):
         trial_list = []
 
         # Add the pre-stimulus period to baseline

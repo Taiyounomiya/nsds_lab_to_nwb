@@ -1,9 +1,4 @@
-import logging
-
 from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTokenizer
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class SingleTokenizer(BaseTokenizer):
@@ -32,7 +27,7 @@ class SingleTokenizer(BaseTokenizer):
             raise ValueError(mismatch_msg)
 
     def _tokenize(self, stim_vals, stim_onsets,
-                  *, audio_play_length, rec_end_time, **unused_metadata):
+                  *, audio_start_time, audio_end_time, rec_end_time):
         stim_name = self.stim_configs['name']
         if stim_name == 'baseline':
             # add single trial
@@ -43,18 +38,7 @@ class SingleTokenizer(BaseTokenizer):
             return trial_list
 
         # -- in case of continuous stimulus, such as DMR --
-
         stim_start_time = stim_onsets[0]
-        first_mark = self.stim_configs['first_mark']
-        audio_start_time = stim_start_time - first_mark
-        audio_end_time = audio_start_time + audio_play_length
-
-        stim_name = self.stim_configs['name']
-        logger.debug(f'Tokenizing {stim_name} stimulus.')
-        logger.debug(f'audio file start time: {audio_start_time}')
-        logger.debug(f'stim onset: {stim_start_time}')
-        logger.debug(f'audio file end time: {audio_end_time} ')
-        logger.debug(f'recording end time: {rec_end_time}')
 
         trial_list = []
 

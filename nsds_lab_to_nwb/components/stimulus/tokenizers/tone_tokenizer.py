@@ -18,7 +18,11 @@ class ToneTokenizer(BaseTokenizer):
                                      ('amp', 'Stimulus Amplitude')]
 
     def _tokenize(self, stim_vals, stim_onsets,
-                  *, stim_dur, bl_start, bl_end, rec_end_time, **unused_metadata):
+                  *, audio_start_time, audio_end_time, rec_end_time):
+        stim_dur = self.stim_configs['duration']
+        bl_start = self.stim_configs['baseline_start']
+        bl_end = self.stim_configs['baseline_end']
+
         trial_list = []
 
         # Add the pre-stimulus period to baseline
