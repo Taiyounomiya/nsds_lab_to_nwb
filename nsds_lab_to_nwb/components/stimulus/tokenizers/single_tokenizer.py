@@ -3,7 +3,8 @@ from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTo
 
 class SingleTokenizer(BaseTokenizer):
     """
-    Tokenize into a single trial, for stimulus data of type 'continuous'.
+    Tokenize into a single stimulus trial, with possible baseline trials before/after.
+    Suitable for DMR stimulus or baseline (no stimulus) blocks.
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
@@ -13,15 +14,17 @@ class SingleTokenizer(BaseTokenizer):
         self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                                      ('stim_name', 'Stimulus name')]
 
-    def tokenize(self, mark_events, mark_time_series, stim_vals,
-                 audio_play_length):
-        # in the continuous case, just looking for the *first* stim onset
-        stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
-        rec_end_time = mark_time_series.num_samples / mark_time_series.rate
-        trial_list = self._tokenize(stim_vals, stim_onsets,
-                                    rec_end_time=rec_end_time,
-                                    audio_play_length=audio_play_length)
-        return trial_list
+    def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
+        # in the continuous case, we only look for the *first* stim onset.
+        num_onsets = len(stim_onsets)
+        mismatch_msg = (
+            f"{self.tokenizer_type}: "
+            + "No stimulus onsets found "
+            + f"in block {self.block_name}. "
+            + f"Expected at least one.")
+
+        if num_onsets == 0:
+            raise ValueError(mismatch_msg)
 
     def _tokenize(self, stim_vals, stim_onsets,
                   *, audio_play_length, rec_end_time, **unused_metadata):
@@ -36,20 +39,21 @@ class SingleTokenizer(BaseTokenizer):
 
         # -- in case of continuous stimulus, such as DMR --
 
+        stim_start_time = stim_onsets[0]
         first_mark = self.stim_configs['first_mark']
-        audio_start_time = stim_onsets[0] - first_mark
+        audio_start_time = stim_start_time - first_mark
         audio_end_time = audio_start_time + audio_play_length
 
         trial_list = []
 
         # add pre-stimulus period to baseline
         trial_list.append(dict(start_time=0.0,
-                               stop_time=stim_onsets[0],
+                               stop_time=stim_start_time,
                                sb='b',
                                stim_name=''))
 
         # add single trial with continuous stimulus
-        trial_list.append(dict(start_time=stim_onsets[0],
+        trial_list.append(dict(start_time=stim_start_time,
                                stop_time=min(audio_end_time, rec_end_time),
                                sb='s',
                                stim_name=stim_name))
