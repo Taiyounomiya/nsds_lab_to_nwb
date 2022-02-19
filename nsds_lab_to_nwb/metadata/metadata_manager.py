@@ -509,12 +509,20 @@ class MetadataManager:
             logger.warning('Missing stimulus name in metadata.')
             return
 
-        stim_name, _ = check_stimulus_name(stimulus_metadata['name'])
+        stim_name, stim_info = check_stimulus_name(stimulus_metadata['name'])
         if stim_name != stimulus_metadata['name']:
             stimulus_metadata['alt_name'] = stimulus_metadata['name']
-        stim_yaml_path = os.path.join(self.yaml_lib_path, 'stimulus', stim_name + '.yaml')
-        logger.debug(f'Trying to read stimulus metadata from {stim_yaml_path}...')
-        stimulus_metadata.update(read_yaml(stim_yaml_path))
+
+        # old behavior: load <stim_name>.yaml file from metadata library
+        # remove this once new behavior (below) is stable
+        # ---
+        # stim_yaml_path = os.path.join(self.yaml_lib_path, 'stimulus', stim_name + '.yaml')
+        # logger.debug(f'Trying to read stimulus metadata from {stim_yaml_path}...')
+        # stimulus_metadata.update(read_yaml(stim_yaml_path))
+
+        # stimulus metadata now included in list_of_stimuli in this package
+        stimulus_metadata['name'] = stim_name
+        stimulus_metadata.update(**stim_info['metadata'])
 
     def __load_probes(self, device_metadata):
         e_id_gen = itertools.count()    # Electrode ID, unique for channels across devices
