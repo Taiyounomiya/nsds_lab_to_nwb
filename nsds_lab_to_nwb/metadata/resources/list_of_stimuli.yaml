@@ -10,21 +10,40 @@
 #               indicating when events happens in auditory stimulus
 #   parameter_path: (str) path to the mat file, when available,
 #               that stores parameters that describe auditory stimlus
+#   metadata: (dict) what was previously in <stim_name>.yaml in metadata lib
+#       known keys [type, baseline_start, baseline_end, duration, nsamples,
+#                   first_mark, mark_offset, mark_threshold, mark_sampling_rate]
 # ---------------------------------------------------------------
 
-tone150:
-    alt_names: ['NC Tone 150']
-    description: ''
-    audio_path: 'Tone150/freq_resp_area_stimulus_signal_flo500Hz_fhi32000Hz_nfreq30_natten1_nreps150_fs96000.wav'
-    marker_path: 'Tone150/freq_resp_area_stimulus_trigger_flo500Hz_fhi32000Hz_nfreq30_natten1_nreps150_fs96000.wav'
-    parameter_path: 'Tone150/freq_resp_area_stimulus_params_flo500Hz_fhi32000Hz_nfreq30_natten1_nreps150_fs96000.mat'
+baseline:
+    alt_names: ['Baseline']
+    description: 'No stimulus'
+    audio_path: null
+    marker_path: null
+    parameter_path: null
     metadata:
-        type: discrete
-        baseline_start: 0.1
-        baseline_end: 0.18
-        duration: 0.05
-        nsamples: 4500
-        first_mark: 5.0
+        type: continuous
+        baseline_start: 0.0
+        baseline_end: 0.0
+        duration: 0.0
+        first_mark: 0.0
+        mark_offset: 0
+        mark_threshold: 0.3
+        mark_sampling_rate: 12207.03125
+
+
+dmr:
+    alt_names: ['Ripple']
+    description: ''
+    audio_path: 'DMR/dmr-500flo-40000fhi-4SM-40TM-40db-96khz-48DF-15min.wav'
+    marker_path: 'DMR/trig-dmr-500flo-40000fhi-4SM-40TM-40db-96khz-48DF-15min.wav'
+    parameter_path: ''
+    metadata:
+        type: continuous
+        baseline_start: 0.0
+        baseline_end: 0.0
+        duration: 0.0
+        first_mark: 10.0
         mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
@@ -66,37 +85,19 @@ tone:
         mark_sampling_rate: 12207.03125
 
 
-wn2:
-    alt_names: ['White noise']
-    description: '60 bursts of white noise lasting 100ms repeated every second'
-    audio_path: 'WN/tb_noise_burst_stim_fs96kHz_signal.wav'
-    marker_path: 'WN/tb_noise_burst_stim_fs96kHz_trigger.wav'
-    parameter_path: ''
+tone150:
+    alt_names: ['NC Tone 150']
+    description: ''
+    audio_path: 'Tone150/freq_resp_area_stimulus_signal_flo500Hz_fhi32000Hz_nfreq30_natten1_nreps150_fs96000.wav'
+    marker_path: 'Tone150/freq_resp_area_stimulus_trigger_flo500Hz_fhi32000Hz_nfreq30_natten1_nreps150_fs96000.wav'
+    parameter_path: 'Tone150/freq_resp_area_stimulus_params_flo500Hz_fhi32000Hz_nfreq30_natten1_nreps150_fs96000.mat'
     metadata:
         type: discrete
-        baseline_start: 0.3
-        baseline_end: 0.5
-        duration: 0.1
-        nsamples: 60
-        first_mark: 0.0
-        mark_offset: 0.25
-        mark_threshold: 0.3
-        mark_sampling_rate: 12207.03125
-        stim_values: 'np.ones(60)'
-
-
-dmr:
-    alt_names: ['Ripple']
-    description: ''
-    audio_path: 'DMR/dmr-500flo-40000fhi-4SM-40TM-40db-96khz-48DF-15min.wav'
-    marker_path: 'DMR/trig-dmr-500flo-40000fhi-4SM-40TM-40db-96khz-48DF-15min.wav'
-    parameter_path: ''
-    metadata:
-        type: continuous
-        baseline_start: 0.0
-        baseline_end: 0.0
-        duration: 0.0
-        first_mark: 10.0
+        baseline_start: 0.1
+        baseline_end: 0.18
+        duration: 0.05
+        nsamples: 4500
+        first_mark: 5.0
         mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
@@ -120,18 +121,20 @@ tone_diagnostic:
         mark_sampling_rate: 12207.03125
 
 
-baseline:
-    alt_names: ['Baseline']
-    description: 'No stimulus'
-    audio_path: null
-    marker_path: null
-    parameter_path: null
+wn2:
+    alt_names: ['White noise']
+    description: '60 bursts of white noise lasting 100ms repeated every second'
+    audio_path: 'WN/tb_noise_burst_stim_fs96kHz_signal.wav'
+    marker_path: 'WN/tb_noise_burst_stim_fs96kHz_trigger.wav'
+    parameter_path: ''
     metadata:
-        type: continuous
-        baseline_start: 0.0
-        baseline_end: 0.0
-        duration: 0.0
+        type: discrete
+        baseline_start: 0.3
+        baseline_end: 0.5
+        duration: 0.1
+        nsamples: 60
         first_mark: 0.0
-        mark_offset: 0
+        mark_offset: 0.25
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
+        stim_values: 'np.ones(60)'
