@@ -9,7 +9,7 @@ parser.add_argument('--acq', type=str, default=None,
 parser.add_argument('--prep', type=str, default=None,
                     help='Prints details from a preprocessing dataset if specified. ' +
                     'If not found, prints list of datasets')
-parser.add_argument('--trials', action='store_true', 
+parser.add_argument('--trials', action='store_true',
                     help='Prints first 5 trials from trials table')
 args = parser.parse_args()
 nwb_file = args.file
@@ -34,7 +34,3 @@ if prep is not None:
     print(prep_contents)
 if trials:
     print(contents.trials.to_dataframe().head())
-    
-    
-
-
