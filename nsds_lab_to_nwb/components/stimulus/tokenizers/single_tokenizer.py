@@ -39,6 +39,7 @@ class SingleTokenizer(BaseTokenizer):
 
         # -- in case of continuous stimulus, such as DMR --
         stim_start_time = stim_onsets[0]
+        back_pad = self.stim_configs.get('back_pad', 0.0)   # for DMR stimulus
 
         trial_list = []
 
@@ -49,14 +50,15 @@ class SingleTokenizer(BaseTokenizer):
                                stim_name=''))
 
         # add single trial with continuous stimulus
+        stim_stop_time = audio_end_time - back_pad
         trial_list.append(dict(start_time=stim_start_time,
-                               stop_time=min(audio_end_time, rec_end_time),
+                               stop_time=stim_stop_time,
                                sb='s',
                                stim_name=stim_name))
 
         # add post-stimulus period to baseline
-        if audio_end_time < rec_end_time:
-            trial_list.append(dict(start_time=audio_end_time,
+        if stim_stop_time < rec_end_time:
+            trial_list.append(dict(start_time=stim_stop_time,
                                    stop_time=rec_end_time,
                                    sb='b',
                                    stim_name=''))
