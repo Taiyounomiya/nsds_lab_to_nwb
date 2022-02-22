@@ -43,10 +43,11 @@ class BaseTokenizer():
     def _tokenize(self, stim_vals, stim_onsets, **kwargs):
         raise NotImplementedError
 
-    def get_stim_onsets(self, mark_events, mark_time_series):
+    def get_stim_onsets(self, mark_events, mark_time_series, use_tdt_mark_events=False):
         mark_offset = self.stim_configs['mark_offset']
-        if mark_events is not None:
+        if use_tdt_mark_events and mark_events is not None:
             # loaded directly from TDT object
+            # (now suppressed by use_tdt_mark_events=False because wn2 requires re-detection)
             logger.info('Using marker events directly loaded from TDT')
             logger.debug(f'found {len(mark_events)} onsets from TDT-detected events')
             return mark_events + mark_offset
@@ -63,7 +64,6 @@ class BaseTokenizer():
 
     def _get_mark_events(self, mark_data, mark_rate, mark_threshold,
                          min_separation=None):
-        # add front padding, so that i=0 event is not missed
         mark_front_padded = np.concatenate((np.array([0.]), mark_data), axis=0)
         thresh_crossings = np.diff((mark_front_padded > mark_threshold).astype('int'),
                                    axis=0)
