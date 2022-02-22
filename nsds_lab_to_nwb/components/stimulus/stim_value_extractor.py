@@ -23,10 +23,11 @@ class StimValueExtractor():
             if 'gen_tone_stim_vals' in stim_values_command:
                 # for test_tone_stim
                 stim_values = gen_tone_stim_vals()
-            if 'np.ones' in stim_values_command:
-                # for white noises
-                stim_values = eval(stim_values_command)
             return stim_values
+
+        if self.stim_name == 'wn2':
+            # return np.ones(60)   # old behavior, but actually not needed
+            return None
 
         # for tone and timit stimuli
         if 'tone' in self.stim_name:

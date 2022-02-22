@@ -138,4 +138,3 @@ wn2:
         # mark_offset: 0.0            # 0.25
         mark_threshold: 0.1         # 0.3
         mark_sampling_rate: 12207.03125
-        stim_values: 'np.ones(60)'
