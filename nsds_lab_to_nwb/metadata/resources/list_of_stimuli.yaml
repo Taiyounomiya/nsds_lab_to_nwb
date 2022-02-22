@@ -23,9 +23,9 @@ baseline:
     parameter_path: null
     metadata:
         type: continuous
-        baseline_start: 0.0
-        baseline_end: 0.0
-        duration: 0.0
+        baseline_start: null
+        duration: null
+        baseline_end: null
         first_mark: 0.0
         mark_offset: 0
         mark_threshold: 0.3
@@ -40,10 +40,11 @@ dmr:
     parameter_path: ''
     metadata:
         type: continuous
-        baseline_start: 0.0
-        baseline_end: 0.0
-        duration: 0.0
-        first_mark: 10.0
+        baseline_start: null
+        duration: null
+        baseline_end: null
+        back_pad: 60.0          # from end-of-sound to end-of-audio-file
+        first_mark: 10.0        # from start-of-audio-file to start-of-sound
         mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
@@ -57,9 +58,9 @@ timit:
     parameter_path: 'TIMIT/timit998/timit998.txt'
     metadata:
         type: discrete
-        baseline_start: 3.0
-        baseline_end: 3.0
-        duration: -1
+        baseline_start: 0       # 3.0
+        duration: null
+        baseline_end: 0.2       # 3.0
         nsamples: 998
         first_mark: 5.0
         mark_offset: 0
@@ -75,9 +76,9 @@ tone:
     parameter_path: 'Tone/Tone.stimVls.mat'   # copied from mars.configs
     metadata:
         type: discrete
-        baseline_start: 0.1
-        baseline_end: 0.18
+        baseline_start: 0.0     # 0.1
         duration: 0.05
+        baseline_end: 0.25      # 0.18
         nsamples: 4800
         first_mark: 5.0
         mark_offset: 0
@@ -93,11 +94,11 @@ tone150:
     parameter_path: 'Tone150/freq_resp_area_stimulus_params_flo500Hz_fhi32000Hz_nfreq30_natten1_nreps150_fs96000.mat'
     metadata:
         type: discrete
-        baseline_start: 0.1
-        baseline_end: 0.18
+        baseline_start: 0.0     # 0.1
         duration: 0.05
+        baseline_end: 0.25      # 0.18
         nsamples: 4500
-        first_mark: 5.0
+        first_mark: 5.125       # 5.0
         mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
@@ -111,13 +112,13 @@ tone_diagnostic:
     parameter_path: 'ToneDiagnostic/Tone_diag_stim.stimVls.mat'
     metadata:
         type: discrete
-        baseline_start: 0.1
-        baseline_end: 0.18
+        baseline_start: 0.125       # 0.1
         duration: 0.05
-        nsamples: Unknown
+        baseline_end: 0.125         # 0.18
+        nsamples: 300
         first_mark: 5.0
         mark_offset: 0
-        mark_threshold: 0.3
+        mark_threshold: 1000        # 0.3
         mark_sampling_rate: 12207.03125
 
 
@@ -129,12 +130,12 @@ wn2:
     parameter_path: ''
     metadata:
         type: discrete
-        baseline_start: 0.3
-        baseline_end: 0.5
+        baseline_start: 0.25        # 0.3
         duration: 0.1
+        baseline_end: 0.65          # 0.5
         nsamples: 60
         first_mark: 0.0
-        mark_offset: 0.25
+        mark_offset: 0.0            # 0.25
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
         stim_values: 'np.ones(60)'
