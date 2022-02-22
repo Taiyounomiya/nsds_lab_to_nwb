@@ -68,6 +68,5 @@ class StimulusOriginator():
 
         # starting time for the stimulus TimeSeries
         stim_starting_time = (first_recorded_mark
-                              - self.stim_configs['mark_offset']  # adjust for mark offset
                               - self.stim_configs['first_mark'])  # time between stimulus DVD start and the first mark
         return stim_starting_time

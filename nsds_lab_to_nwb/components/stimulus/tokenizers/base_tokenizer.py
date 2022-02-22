@@ -44,13 +44,12 @@ class BaseTokenizer():
         raise NotImplementedError
 
     def get_stim_onsets(self, mark_events, mark_time_series, use_tdt_mark_events=False):
-        mark_offset = self.stim_configs['mark_offset']
         if use_tdt_mark_events and mark_events is not None:
             # loaded directly from TDT object
             # (now suppressed by use_tdt_mark_events=False because wn2 requires re-detection)
             logger.info('Using marker events directly loaded from TDT')
             logger.debug(f'found {len(mark_events)} onsets from TDT-detected events')
-            return mark_events + mark_offset
+            return mark_events
 
         logger.info('Detecting stimulus onsets by thresholding the mark track')
         mark_rate = mark_time_series.rate
@@ -60,7 +59,7 @@ class BaseTokenizer():
                                             mark_rate, mark_threshold,
                                             min_separation=stim_duration)
         logger.debug(f'found {len(mark_events)} onsets by thresholding mark track')
-        return mark_events + mark_offset
+        return mark_events
 
     def _get_mark_events(self, mark_data, mark_rate, mark_threshold,
                          min_separation=None):

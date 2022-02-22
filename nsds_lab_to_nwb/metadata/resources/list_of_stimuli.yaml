@@ -12,7 +12,7 @@
 #               that stores parameters that describe auditory stimlus
 #   metadata: (dict) what was previously in <stim_name>.yaml in metadata lib
 #       known keys [type, baseline_start, baseline_end, duration, nsamples,
-#                   first_mark, mark_offset, mark_threshold, mark_sampling_rate]
+#                   first_mark, mark_threshold, mark_sampling_rate]
 # ---------------------------------------------------------------
 
 baseline:
@@ -27,7 +27,7 @@ baseline:
         duration: null
         baseline_end: null
         first_mark: 0.0
-        mark_offset: 0
+        # mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
 
@@ -45,7 +45,7 @@ dmr:
         baseline_end: null
         back_pad: 60.0          # from end-of-sound to end-of-audio-file
         first_mark: 10.0        # from start-of-audio-file to start-of-sound
-        mark_offset: 0
+        # mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
 
@@ -63,7 +63,7 @@ timit:
         baseline_end: 0.2       # 3.0
         nsamples: 998
         first_mark: 5.0
-        mark_offset: 0
+        # mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
 
@@ -81,7 +81,7 @@ tone:
         baseline_end: 0.25      # 0.18
         nsamples: 4800
         first_mark: 5.0
-        mark_offset: 0
+        # mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
 
@@ -99,7 +99,7 @@ tone150:
         baseline_end: 0.25      # 0.18
         nsamples: 4500
         first_mark: 5.125       # 5.0
-        mark_offset: 0
+        # mark_offset: 0
         mark_threshold: 0.3
         mark_sampling_rate: 12207.03125
 
@@ -117,7 +117,7 @@ tone_diagnostic:
         baseline_end: 0.125         # 0.18
         nsamples: 300
         first_mark: 5.0
-        mark_offset: 0
+        # mark_offset: 0
         mark_threshold: 1000        # 0.3
         mark_sampling_rate: 12207.03125
 
@@ -135,7 +135,7 @@ wn2:
         baseline_end: 0.65          # 0.5
         nsamples: 60
         first_mark: 0.0
-        mark_offset: 0.0            # 0.25
+        # mark_offset: 0.0            # 0.25
         mark_threshold: 0.1         # 0.3
         mark_sampling_rate: 12207.03125
         stim_values: 'np.ones(60)'
