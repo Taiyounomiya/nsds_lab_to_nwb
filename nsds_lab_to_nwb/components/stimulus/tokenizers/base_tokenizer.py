@@ -55,7 +55,7 @@ class BaseTokenizer():
         logger.info('Detecting stimulus onsets by thresholding the mark track')
         mark_rate = mark_time_series.rate
         stim_duration = self.stim_configs.get('duration', None)
-        mark_threshold = self._get_mark_threshold()
+        mark_threshold = self.stim_configs['mark_threshold']
         mark_events = self._get_mark_events(mark_time_series.data[:],
                                             mark_rate, mark_threshold,
                                             min_separation=stim_duration)
@@ -77,13 +77,6 @@ class BaseTokenizer():
             mark_events = np.delete(mark_events, too_close)
 
         return mark_events
-
-    def _get_mark_threshold(self):
-        # NOTE: this is only used when TDT-loaded mark onsets are not available.
-        # see issue #102 for more discussion on mark thresholds.
-        mark_threshold = self.stim_configs['mark_threshold']
-        logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
-        return mark_threshold
 
     def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
         ''' Validate that the number of identified stim onsets
