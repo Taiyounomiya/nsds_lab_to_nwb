@@ -54,3 +54,11 @@ class TrialsManager():
         has_custom_trial_columns = ((column_args[0] in nwb_content.trials.colnames)
                                     for column_args in self.custom_trial_columns)
         return all(has_custom_trial_columns)
+
+    def get_audio_start_time(self):
+        audio_start_time = self.tokenizer.audio_start_time
+        if audio_start_time is None:
+            if self.stim_configs['name'] == 'baseline':
+                return 0.0
+            raise ValueError('audio_start_time should be set in the tokenizer.')
+        return audio_start_time

@@ -27,7 +27,7 @@ class SingleTokenizer(BaseTokenizer):
             raise ValueError(mismatch_msg)
 
     def _tokenize(self, stim_vals, stim_onsets,
-                  *, audio_start_time, audio_end_time, rec_end_time):
+                  *, rec_end_time, audio_start_time=None, audio_end_time=None):
         stim_name = self.stim_configs['name']
         if stim_name == 'baseline':
             # add single trial

@@ -44,8 +44,7 @@ class StimulusOriginator():
 
         # add mark track
         logger.info('Adding marks...')
-        mark_starting_time = 0.0    # see issue #88 for discussion
-        mark_time_series, mark_events = self.mark_manager.get_mark_track(starting_time=mark_starting_time)
+        mark_time_series, mark_events = self.mark_manager.get_mark_track()
         nwb_content.add_stimulus(mark_time_series)
 
         # tokenize into trials, based on the mark track
@@ -54,20 +53,7 @@ class StimulusOriginator():
 
         # add stimulus WAV data
         logger.info('Adding stimulus waveform...')
-        stim_starting_time = self._get_stim_starting_time(nwb_content)
-        stim_wav_time_series = self.wav_manager.get_stim_wav(starting_time=stim_starting_time)
+        audio_start_time = self.trials_manager.get_audio_start_time()
+        stim_wav_time_series = self.wav_manager.get_stim_wav(starting_time=audio_start_time)
         if stim_wav_time_series is not None:
             nwb_content.add_stimulus(stim_wav_time_series)
-
-    def _get_stim_starting_time(self, nwb_content):
-        try:
-            time_table = nwb_content.trials.to_dataframe().query('sb == "s"')['start_time']
-            first_recorded_mark = time_table.values[0]
-        except IndexError:
-            # there may be no 's' trial if it was a 'baseline' stimulus block
-            first_recorded_mark = 0.0    # see issue #88 for discussion
-
-        # starting time for the stimulus TimeSeries
-        stim_starting_time = (first_recorded_mark
-                              - self.stim_configs['first_mark'])  # time between stimulus DVD start and the first mark
-        return stim_starting_time

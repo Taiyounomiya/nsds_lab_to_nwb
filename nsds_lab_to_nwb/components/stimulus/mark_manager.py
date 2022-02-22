@@ -9,7 +9,7 @@ class MarkManager():
         self.dataset = dataset
         self.mark_obj_name = 'stim_onset_marks'  # 'recorded_mark' (previous name)
 
-    def get_mark_track(self, starting_time):
+    def get_mark_track(self):
         # Read the mark track
         if hasattr(self.dataset, 'htk_mark_path'):
             mark_file = HTKFile(self.dataset.htk_mark_path)
@@ -27,6 +27,7 @@ class MarkManager():
                 mark_events = None
 
         # Create the mark timeseries
+        starting_time = 0.0    # because this is recorded mark, always starting at rec t=0
         mark_time_series = TimeSeries(name=self.mark_obj_name,
                                       data=mark_track,
                                       unit='Volts',

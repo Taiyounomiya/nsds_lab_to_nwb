@@ -14,10 +14,17 @@ class BaseTokenizer():
 
         self.tokenizer_type = 'BaseTokenizer'
         self.custom_trial_columns = None
+        self.audio_start_time = None
 
     def tokenize(self, mark_events, mark_time_series):
-        stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
+
+        if self.stim_configs['name'] == 'baseline':
+            # using SingleTokenizer._tokenize
+            trial_list = self._tokenize(None, None, rec_end_time=rec_end_time)
+            return trial_list
+
+        stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
 
         stim_start_time = stim_onsets[0]
         audio_start_time = stim_start_time - self.stim_configs['first_mark']
@@ -33,6 +40,7 @@ class BaseTokenizer():
         logger.debug(f'recording end time: {rec_end_time}')
 
         self._validate_num_stim_onsets(stim_onsets)
+        self.audio_start_time = audio_start_time
 
         stim_vals = self._load_stim_parameters()
         if stim_vals is not None:
