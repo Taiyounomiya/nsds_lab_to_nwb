@@ -14,7 +14,7 @@ class SingleTokenizer(BaseTokenizer):
         self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                                      ('stim_name', 'Stimulus name')]
 
-    def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
+    def _validate_num_stim_onsets(self, stim_onsets):
         # in the continuous case, we only look for the *first* stim onset.
         num_onsets = len(stim_onsets)
         mismatch_msg = (

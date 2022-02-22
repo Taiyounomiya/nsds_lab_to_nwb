@@ -32,7 +32,7 @@ class BaseTokenizer():
         logger.debug(f'audio file end time: {audio_end_time} ')
         logger.debug(f'recording end time: {rec_end_time}')
 
-        self._validate_num_stim_onsets(stim_vals, stim_onsets)
+        self._validate_num_stim_onsets(stim_onsets)
 
         trial_list = self._tokenize(stim_vals, stim_onsets,
                                     audio_start_time=audio_start_time,
@@ -78,12 +78,12 @@ class BaseTokenizer():
 
         return mark_events
 
-    def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
+    def _validate_num_stim_onsets(self, stim_onsets):
         ''' Validate that the number of identified stim onsets
-        is equal to the number of stim parameterizations in stim_vals.
+        is equal to the known number of stimulus trials.
         '''
         num_onsets = len(stim_onsets)
-        num_expected_trials = len(stim_vals)
+        num_expected_trials = self.stim_configs['nsamples']
         mismatch_msg = (
             f"{self.tokenizer_type}: "
             + "Incorrect number of stimulus onsets found "
