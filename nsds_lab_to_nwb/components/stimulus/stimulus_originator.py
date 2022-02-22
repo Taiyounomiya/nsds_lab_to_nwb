@@ -29,10 +29,6 @@ class StimulusOriginator():
         self.trials_manager = TrialsManager(self.metadata['block_name'],
                                             self.stim_configs)
 
-        # names for mark and stimulus time series objects
-        self.mark_obj_name = 'stim_onset_marks'  # 'recorded_mark' (previous name)
-        self.stim_wav_obj_name = 'stim_waveform'  # 'raw_stimulus' (previous name)
-
     def _get_stim_parameter_path(self):
         stim_name = self.stim_configs['name']
         _, stim_info = check_stimulus_name(stim_name)
@@ -49,20 +45,17 @@ class StimulusOriginator():
         # add mark track
         logger.info('Adding marks...')
         mark_starting_time = 0.0    # see issue #88 for discussion
-        mark_time_series, mark_events = self.mark_manager.get_mark_track(starting_time=mark_starting_time,
-                                                                         name=self.mark_obj_name)
+        mark_time_series, mark_events = self.mark_manager.get_mark_track(starting_time=mark_starting_time)
         nwb_content.add_stimulus(mark_time_series)
 
-        # tokenize into trials, once mark track has been added to nwb_content
+        # tokenize into trials, based on the mark track
         logger.info('Tokenizing into trials...')
-        self.trials_manager.add_trials(nwb_content, mark_events,
-                                       mark_obj_name=self.mark_obj_name)
+        self.trials_manager.add_trials(nwb_content, mark_events, mark_time_series)
 
         # add stimulus WAV data
         logger.info('Adding stimulus waveform...')
         stim_starting_time = self._get_stim_starting_time(nwb_content)
-        stim_wav_time_series = self.wav_manager.get_stim_wav(starting_time=stim_starting_time,
-                                                             name=self.stim_wav_obj_name)
+        stim_wav_time_series = self.wav_manager.get_stim_wav(starting_time=stim_starting_time)
         if stim_wav_time_series is not None:
             nwb_content.add_stimulus(stim_wav_time_series)
 

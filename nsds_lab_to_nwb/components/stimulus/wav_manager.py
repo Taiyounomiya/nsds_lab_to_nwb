@@ -20,14 +20,16 @@ class WavManager():
         if self.stim_file is not None:
             self.stim_wav, self.rate, self.length = self.load_stim_from_wav_file()
 
-    def get_stim_wav(self, starting_time, name='raw_stimulus'):
+        self.stim_wav_obj_name = 'stim_waveform'  # 'raw_stimulus' (previous name)
+
+    def get_stim_wav(self, starting_time):
         if self.stim_file is None:
             logger.info(f'Stimulus [{self.stim_name}] has no audio file. ' +
                         'No stimulus will be added to the NWB file.')
             return None
 
         # Create the stimulus timeseries
-        stim_time_series = TimeSeries(name=name,
+        stim_time_series = TimeSeries(name=self.stim_wav_obj_name,
                                       data=self.stim_wav,
                                       starting_time=starting_time,
                                       unit='Volts',

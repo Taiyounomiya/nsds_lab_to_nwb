@@ -7,8 +7,9 @@ from nsds_lab_to_nwb.tools.tdt.tdt_reader import TDTReader
 class MarkManager():
     def __init__(self, dataset):
         self.dataset = dataset
+        self.mark_obj_name = 'stim_onset_marks'  # 'recorded_mark' (previous name)
 
-    def get_mark_track(self, starting_time, name='recorded_mark'):
+    def get_mark_track(self, starting_time):
         # Read the mark track
         if hasattr(self.dataset, 'htk_mark_path'):
             mark_file = HTKFile(self.dataset.htk_mark_path)
@@ -26,7 +27,7 @@ class MarkManager():
                 mark_events = None
 
         # Create the mark timeseries
-        mark_time_series = TimeSeries(name=name,
+        mark_time_series = TimeSeries(name=self.mark_obj_name,
                                       data=mark_track,
                                       unit='Volts',
                                       starting_time=starting_time,
