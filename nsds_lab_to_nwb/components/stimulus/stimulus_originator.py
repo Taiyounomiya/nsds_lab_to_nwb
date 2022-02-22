@@ -7,6 +7,7 @@ from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
 from nsds_lab_to_nwb.utils import get_stim_lib_path
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class StimulusOriginator():
@@ -23,7 +24,6 @@ class StimulusOriginator():
         self.wav_manager = WavManager(self.stim_lib_path,
                                       self.stim_configs)
 
-        # TODO: store play_length as part of stimulus metadata yaml?
         self.stim_configs['play_length'] = self.wav_manager.length
 
         self.trials_manager = TrialsManager(self.metadata['block_name'],

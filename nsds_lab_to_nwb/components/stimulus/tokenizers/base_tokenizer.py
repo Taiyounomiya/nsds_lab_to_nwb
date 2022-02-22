@@ -17,19 +17,22 @@ class BaseTokenizer():
 
     def tokenize(self, mark_events, mark_time_series, stim_vals):
         stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
-        self._validate_num_stim_onsets(stim_vals, stim_onsets)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
 
         stim_start_time = stim_onsets[0]
         audio_start_time = stim_start_time - self.stim_configs['first_mark']
         audio_end_time = audio_start_time + self.stim_configs['play_length']
+        last_marker_time = stim_onsets[-1]
 
         stim_name = self.stim_configs['name']
         logger.debug(f'Tokenizing {stim_name} stimulus.')
         logger.debug(f'audio file start time: {audio_start_time}')
         logger.debug(f'stim onset: {stim_start_time}')
+        logger.debug(f'last marker: {last_marker_time}')
         logger.debug(f'audio file end time: {audio_end_time} ')
         logger.debug(f'recording end time: {rec_end_time}')
+
+        self._validate_num_stim_onsets(stim_vals, stim_onsets)
 
         trial_list = self._tokenize(stim_vals, stim_onsets,
                                     audio_start_time=audio_start_time,
@@ -37,8 +40,7 @@ class BaseTokenizer():
                                     rec_end_time=rec_end_time)
         return trial_list
 
-    def _tokenize(self, stim_vals, stim_onsets,
-                  *, stim_dur, bl_start, bl_end, rec_end_time):
+    def _tokenize(self, stim_vals, stim_onsets, **kwargs):
         raise NotImplementedError
 
     def get_stim_onsets(self, mark_events, mark_time_series):

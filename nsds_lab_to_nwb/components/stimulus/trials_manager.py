@@ -6,6 +6,7 @@ from nsds_lab_to_nwb.components.stimulus.tokenizers.timit_tokenizer import TIMIT
 from nsds_lab_to_nwb.components.stimulus.tokenizers.wn_tokenizer import WNTokenizer
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class TrialsManager():
@@ -24,6 +25,8 @@ class TrialsManager():
             self.tokenizer = WNTokenizer(self.block_name, self.stim_configs)
         else:
             raise ValueError(f"Unknown stimulus type '{stim_name}' for mark tokenizer")
+
+        logger.info(f'Stimulus {stim_name}: using {self.tokenizer.tokenizer_type}.')
 
         self.custom_trial_columns = self.tokenizer.custom_trial_columns
         if self.custom_trial_columns is None:
