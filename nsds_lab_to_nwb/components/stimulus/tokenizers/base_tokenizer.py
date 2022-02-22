@@ -15,7 +15,7 @@ class BaseTokenizer():
         self.tokenizer_type = 'BaseTokenizer'
         self.custom_trial_columns = None
 
-    def tokenize(self, mark_events, mark_time_series, stim_vals):
+    def tokenize(self, mark_events, mark_time_series):
         stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
 
@@ -34,11 +34,20 @@ class BaseTokenizer():
 
         self._validate_num_stim_onsets(stim_onsets)
 
+        stim_vals = self._load_stim_parameters()
+        if stim_vals is not None:
+            if len(stim_vals) != self.stim_configs['nsamples']:
+                raise ValueError('incorrect number of stimulus parameter sets found.')
+
         trial_list = self._tokenize(stim_vals, stim_onsets,
                                     audio_start_time=audio_start_time,
                                     audio_end_time=audio_end_time,
                                     rec_end_time=rec_end_time)
         return trial_list
+
+    def _load_stim_parameters(self):
+        # override in Tone and TIMIT tokenizers
+        return None
 
     def _tokenize(self, stim_vals, stim_onsets, **kwargs):
         raise NotImplementedError

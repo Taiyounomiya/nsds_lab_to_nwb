@@ -13,6 +13,11 @@ class TIMITTokenizer(BaseTokenizer):
         self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                                      ('sample_filename', 'Sample Filename')]
 
+    def _load_stim_parameters(self):
+        stim_params_path = self.stim_configs['stim_params_path']
+        stim_vals = timit_stimulus_values(stim_params_path)
+        return stim_vals
+
     def _tokenize(self, stim_vals, stim_onsets,
                   *, audio_start_time, audio_end_time, rec_end_time):
         trial_list = []
@@ -42,3 +47,22 @@ class TIMITTokenizer(BaseTokenizer):
                                    sample_filename='none'))
 
         return trial_list
+
+
+def timit_stimulus_values(file_path):
+    """adapted from mars.configs.block_directory
+
+    Parameters
+    -----------
+    file_path : full path to a .txt file that contains a list of filenames
+
+    Returns
+    --------
+    stim_vals: list of str
+        each item is a .wav file name in TIMIT.
+    """
+    # expecting a text file, one .wav filename string per row
+    with open(file_path) as f:
+        lines = f.readlines()
+    stim_vals = [line.rstrip(' \n') for line in lines]
+    return stim_vals

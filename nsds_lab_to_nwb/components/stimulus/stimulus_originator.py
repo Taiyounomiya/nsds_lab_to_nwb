@@ -1,9 +1,11 @@
 import logging
+import os
 
 from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
-from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
+# from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
 from nsds_lab_to_nwb.components.stimulus.trials_manager import TrialsManager
 from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
+from nsds_lab_to_nwb.metadata.stim_name_helper import check_stimulus_name
 from nsds_lab_to_nwb.utils import get_stim_lib_path
 
 logger = logging.getLogger(__name__)
@@ -17,13 +19,11 @@ class StimulusOriginator():
         self.stim_lib_path = get_stim_lib_path(self.dataset.stim_lib_path)
         self.stim_configs = self.metadata['stimulus']
 
-        self.stim_vals = StimValueExtractor(self.stim_configs,
-                                            self.stim_lib_path).extract()
-
         self.mark_manager = MarkManager(self.dataset)
         self.wav_manager = WavManager(self.stim_lib_path,
                                       self.stim_configs)
 
+        self.stim_configs['stim_params_path'] = self._get_stim_parameter_path()
         self.stim_configs['play_length'] = self.wav_manager.length
 
         self.trials_manager = TrialsManager(self.metadata['block_name'],
@@ -32,6 +32,14 @@ class StimulusOriginator():
         # names for mark and stimulus time series objects
         self.mark_obj_name = 'stim_onset_marks'  # 'recorded_mark' (previous name)
         self.stim_wav_obj_name = 'stim_waveform'  # 'raw_stimulus' (previous name)
+
+    def _get_stim_parameter_path(self):
+        stim_name = self.stim_configs['name']
+        _, stim_info = check_stimulus_name(stim_name)
+        parameter_path = stim_info['parameter_path']
+        if parameter_path is None or len(parameter_path) == 0:
+             return None
+        return os.path.join(self.stim_lib_path, parameter_path)
 
     def make(self, nwb_content):
         stim_name = self.stim_configs['name']
@@ -47,7 +55,7 @@ class StimulusOriginator():
 
         # tokenize into trials, once mark track has been added to nwb_content
         logger.info('Tokenizing into trials...')
-        self.trials_manager.add_trials(nwb_content, mark_events, self.stim_vals,
+        self.trials_manager.add_trials(nwb_content, mark_events,
                                        mark_obj_name=self.mark_obj_name)
 
         # add stimulus WAV data
