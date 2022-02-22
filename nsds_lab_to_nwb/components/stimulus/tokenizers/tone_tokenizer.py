@@ -3,10 +3,7 @@ from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTo
 
 class ToneTokenizer(BaseTokenizer):
     """
-    Tokenize tone pip stimulus data
-
-    Original version author: Max Dougherty <maxdougherty@lbl.gov>
-    As part of MARS
+    Tokenize into discrete tone pip stimulus trials.
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
@@ -19,40 +16,59 @@ class ToneTokenizer(BaseTokenizer):
 
     def _tokenize(self, stim_vals, stim_onsets,
                   *, audio_start_time, audio_end_time, rec_end_time):
-        stim_dur = self.stim_configs['duration']
         bl_start = self.stim_configs['baseline_start']
+        stim_dur = self.stim_configs['duration']
         bl_end = self.stim_configs['baseline_end']
 
         trial_list = []
 
-        # Add the pre-stimulus period to baseline
+        none_str = 'nan'    # for indicating baseline frq and amp
+
+        # period before the first stimulus starts
         trial_list.append(dict(start_time=0.0,
-                               stop_time=(stim_onsets[0] - stim_dur),
+                               stop_time=stim_onsets[0],
                                sb='b',
-                               frq=str(float(stim_vals[0, 1])),
-                               amp=str(float(stim_vals[0, 0]))))
+                               frq=none_str,
+                               amp=none_str))
 
         for i, onset in enumerate(stim_onsets):
             frq = str(stim_vals[i, 1])
             amp = str(stim_vals[i, 0])
-            trial_list.append(dict(start_time=onset,
-                                   stop_time=(onset + stim_dur),
+
+            # in-trial, pre-signal baseline
+            start_time = onset
+            stop_time = start_time + bl_start
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=stop_time,
+                                   sb='b',
+                                   frq=none_str,
+                                   amp=none_str))
+
+            # actual signal
+            start_time = stop_time
+            stop_time = start_time + stim_dur
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=stop_time,
                                    sb='s',
                                    frq=frq,
                                    amp=amp))
-            if bl_start == bl_end:
-                continue
-            trial_list.append(dict(start_time=(onset + bl_start),
-                                   stop_time=(onset + bl_end),
-                                   sb='b',
-                                   frq=frq,
-                                   amp=amp))
 
-        # Add the period after the last stimulus to  baseline
-        trial_list.append(dict(start_time=(stim_onsets[-1] + bl_end),
-                               stop_time=rec_end_time,
-                               sb='b',
-                               frq=frq,
-                               amp=amp))
+            # in-trial, post-signal baseline
+            start_time = stop_time
+            stop_time = start_time + bl_end
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=stop_time,
+                                   sb='b',
+                                   frq=none_str,
+                                   amp=none_str))
+
+        # period after the end of last stim trial until recording stops
+        if stop_time < rec_end_time:
+            start_time = stop_time
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=rec_end_time,
+                                   sb='b',
+                                   frq=none_str,
+                                   amp=none_str))
 
         return trial_list

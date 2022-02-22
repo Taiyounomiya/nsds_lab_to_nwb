@@ -9,10 +9,7 @@ logger = logging.getLogger(__name__)
 
 class WNTokenizer(BaseTokenizer):
     """
-    Tokenize white noise stimulus data
-
-    Original version author: Vyassa Baratham <vbaratham@lbl.gov>
-    As part of MARS
+    Tokenize into discrete white noise stimulus trials.
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
@@ -23,23 +20,45 @@ class WNTokenizer(BaseTokenizer):
 
     def _tokenize(self, stim_vals, stim_onsets,
                   *, audio_start_time, audio_end_time, rec_end_time):
-        stim_dur = self.stim_configs['duration']
         bl_start = self.stim_configs['baseline_start']
+        stim_dur = self.stim_configs['duration']
         bl_end = self.stim_configs['baseline_end']
 
         trial_list = []
 
-        # Add the pre-stimulus period to baseline
-        # trial_list.append(dict(start_time=0.0, stop_time=stim_onsets[0]-stim_dur, sb='b'))
+        # period before the first stimulus starts
+        trial_list.append(dict(start_time=0.0,
+                               stop_time=stim_onsets[0],
+                               sb='b'))
 
-        for onset in stim_onsets:
-            trial_list.append(dict(start_time=onset, stop_time=(onset + stim_dur), sb='s'))
-            if bl_start == bl_end:
-                continue
-            trial_list.append(dict(start_time=(onset + bl_start), stop_time=(onset + bl_end), sb='b'))
+        for i, onset in enumerate(stim_onsets):
+            # in-trial, pre-signal baseline
+            start_time = onset
+            stop_time = start_time + bl_start
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=stop_time,
+                                   sb='b'))
 
-        # Add the period after the last stimulus to  baseline
-        # trial_list.append(dict(start_time=stim_onsets[-1]+bl_end, stop_time=rec_end_time, sb='b'))
+            # actual signal
+            start_time = stop_time
+            stop_time = start_time + stim_dur
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=stop_time,
+                                   sb='s'))
+
+            # in-trial, post-signal baseline
+            start_time = stop_time
+            stop_time = start_time + bl_end
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=stop_time,
+                                   sb='b'))
+
+        # period after the end of last stim trial until recording stops
+        if stop_time < rec_end_time:
+            start_time = stop_time
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=rec_end_time,
+                                   sb='b'))
 
         return trial_list
 

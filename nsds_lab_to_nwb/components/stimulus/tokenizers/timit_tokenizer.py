@@ -3,10 +3,7 @@ from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTo
 
 class TIMITTokenizer(BaseTokenizer):
     """
-    Tokenize TIMIT stimulus data
-
-    Original version author: Max Dougherty <maxdougherty@lbl.gov>
-    As part of MARS
+    Tokenize into TIMIT stimulus trials.
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
@@ -20,7 +17,7 @@ class TIMITTokenizer(BaseTokenizer):
                   *, audio_start_time, audio_end_time, rec_end_time):
         trial_list = []
 
-        # Add the pre-stimulus period to baseline
+        # period before the first stimulus starts
         trial_list.append(dict(start_time=0.0,
                                stop_time=stim_onsets[0],
                                sb='b',
@@ -37,10 +34,11 @@ class TIMITTokenizer(BaseTokenizer):
                                    sb='s',
                                    sample_filename=filename))
 
-        # Add the period after the last stimulus to baseline
-        trial_list.append(dict(start_time=audio_end_time,
-                               stop_time=rec_end_time,
-                               sb='b',
-                               sample_filename='none'))
+        # period after the end of last stim trial until recording stops
+        if audio_end_time < rec_end_time:
+            trial_list.append(dict(start_time=audio_end_time,
+                                   stop_time=rec_end_time,
+                                   sb='b',
+                                   sample_filename='none'))
 
         return trial_list
