@@ -2,7 +2,6 @@ import logging
 import os
 
 from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
-# from nsds_lab_to_nwb.components.stimulus.stim_value_extractor import StimValueExtractor
 from nsds_lab_to_nwb.components.stimulus.trials_manager import TrialsManager
 from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
 from nsds_lab_to_nwb.metadata.stim_name_helper import check_stimulus_name
@@ -34,7 +33,7 @@ class StimulusOriginator():
         _, stim_info = check_stimulus_name(stim_name)
         parameter_path = stim_info['parameter_path']
         if parameter_path is None or len(parameter_path) == 0:
-             return None
+            return None
         return os.path.join(self.stim_lib_path, parameter_path)
 
     def make(self, nwb_content):

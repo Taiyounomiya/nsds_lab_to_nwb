@@ -21,7 +21,7 @@ class SingleTokenizer(BaseTokenizer):
             f"{self.tokenizer_type}: "
             + "No stimulus onsets found "
             + f"in block {self.block_name}. "
-            + f"Expected at least one.")
+            + "Expected at least one.")
 
         if num_onsets == 0:
             raise ValueError(mismatch_msg)

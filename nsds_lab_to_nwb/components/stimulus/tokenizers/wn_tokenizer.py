@@ -1,5 +1,4 @@
 import logging
-import numpy as np
 
 from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTokenizer
 

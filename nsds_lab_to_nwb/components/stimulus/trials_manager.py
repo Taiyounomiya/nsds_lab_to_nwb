@@ -24,7 +24,7 @@ class TrialsManager():
         elif 'wn' in stim_name:
             self.tokenizer = WNTokenizer(self.block_name, self.stim_configs)
         else:
-            raise ValueError(f"Unknown stimulus type '{stim_name}' for mark tokenizer")
+            raise ValueError(f"Unknown stimulus type '{stim_name}' for trialization")
 
         logger.info(f'Stimulus {stim_name}: using {self.tokenizer.tokenizer_type}.')
 
