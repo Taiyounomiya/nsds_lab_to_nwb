@@ -19,9 +19,13 @@ class WNTokenizer(BaseTokenizer):
 
     def _tokenize(self, stim_vals, stim_onsets,
                   *, audio_start_time, audio_end_time, rec_end_time):
-        bl_start = self.stim_configs['baseline_start']
         stim_dur = self.stim_configs['duration']
+        bl_start = self.stim_configs['baseline_start']
         bl_end = self.stim_configs['baseline_end']
+        if not (stim_dur < bl_start and bl_start < bl_end):
+            raise ValueError('Baseline period should start after the stimulus.'
+                             f'Got stim duration={stim_dur}, baseline_start={bl_start} '
+                             f'and baseline_end={bl_end}, relative to stim onsets.')
 
         trial_list = []
 
@@ -31,23 +35,16 @@ class WNTokenizer(BaseTokenizer):
                                sb='b'))
 
         for i, onset in enumerate(stim_onsets):
-            # in-trial, pre-signal baseline
+            # actual stimulus (always starts at stim_onset)
             start_time = onset
-            stop_time = start_time + bl_start
-            trial_list.append(dict(start_time=start_time,
-                                   stop_time=stop_time,
-                                   sb='b'))
-
-            # actual signal
-            start_time = stop_time
-            stop_time = start_time + stim_dur
+            stop_time = onset + stim_dur
             trial_list.append(dict(start_time=start_time,
                                    stop_time=stop_time,
                                    sb='s'))
 
-            # in-trial, post-signal baseline
-            start_time = stop_time
-            stop_time = start_time + bl_end
+            # in-trial baseline period
+            start_time = onset + bl_start
+            stop_time = onset + bl_end
             trial_list.append(dict(start_time=start_time,
                                    stop_time=stop_time,
                                    sb='b'))

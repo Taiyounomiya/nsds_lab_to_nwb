@@ -24,12 +24,14 @@ class BaseTokenizer():
             trial_list = self._tokenize(None, None, rec_end_time=rec_end_time)
             return trial_list
 
-        stim_onsets = self.get_stim_onsets(mark_events, mark_time_series)
+        mark_events = self.get_mark_events(mark_events, mark_time_series)
+        mark_offset = self.stim_configs['mark_offset']      # from mark to actual stim onset
+        stim_onsets = mark_events + mark_offset
 
         stim_start_time = stim_onsets[0]
-        audio_start_time = stim_start_time - self.stim_configs['first_mark']
+        audio_start_time = mark_events[0] - self.stim_configs['first_mark']
         audio_end_time = audio_start_time + self.stim_configs['play_length']
-        last_marker_time = stim_onsets[-1]
+        last_marker_time = mark_events[-1]
 
         stim_name = self.stim_configs['name']
         logger.debug(f'Tokenizing {stim_name} stimulus.')
@@ -60,7 +62,7 @@ class BaseTokenizer():
     def _tokenize(self, stim_vals, stim_onsets, **kwargs):
         raise NotImplementedError
 
-    def get_stim_onsets(self, mark_events, mark_time_series, use_tdt_mark_events=False):
+    def get_mark_events(self, mark_events, mark_time_series, use_tdt_mark_events=False):
         if use_tdt_mark_events and mark_events is not None:
             # loaded directly from TDT object
             # (now suppressed by use_tdt_mark_events=False because wn2 requires re-detection)
