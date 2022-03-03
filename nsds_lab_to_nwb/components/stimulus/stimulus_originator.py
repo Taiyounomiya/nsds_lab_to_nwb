@@ -18,7 +18,7 @@ class StimulusOriginator():
         self.stim_lib_path = get_stim_lib_path(self.dataset.stim_lib_path)
         self.stim_configs = self.metadata['stimulus']
 
-        self.mark_manager = MarkManager(self.dataset)
+        self.mark_manager = MarkManager(self.dataset, self.stim_configs)
         self.wav_manager = WavManager(self.stim_lib_path,
                                       self.stim_configs)
 
@@ -48,7 +48,8 @@ class StimulusOriginator():
 
         # tokenize into trials, based on the mark track
         logger.info('Tokenizing into trials...')
-        self.trials_manager.add_trials(nwb_content, mark_events, mark_time_series)
+        rec_end_time = mark_time_series.num_samples / mark_time_series.rate
+        self.trials_manager.add_trials(nwb_content, mark_events, rec_end_time)
 
         # add stimulus WAV data
         logger.info('Adding stimulus waveform...')

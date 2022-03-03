@@ -32,13 +32,13 @@ class TrialsManager():
         if self.custom_trial_columns is None:
             raise ValueError('self.custom_trial_columns should be set by the stim-specific tokenizer.')
 
-    def add_trials(self, nwb_content, mark_events, mark_time_series):
+    def add_trials(self, nwb_content, mark_events, rec_end_time):
         if self._already_tokenized(nwb_content):
             logger.info('Block has already been tokenized')
             return
 
         # tokenize to identify trials
-        trial_list = self.tokenizer.tokenize(mark_events, mark_time_series)
+        trial_list = self.tokenizer.tokenize(mark_events, rec_end_time)
 
         # add trial columns, then add trials
         for column_args in self.custom_trial_columns:

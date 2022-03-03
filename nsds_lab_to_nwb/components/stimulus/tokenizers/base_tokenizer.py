@@ -1,5 +1,4 @@
 import logging
-import numpy as np
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -16,15 +15,13 @@ class BaseTokenizer():
         self.custom_trial_columns = None
         self.audio_start_time = None
 
-    def tokenize(self, mark_events, mark_time_series):
-        rec_end_time = mark_time_series.num_samples / mark_time_series.rate
+    def tokenize(self, mark_events, rec_end_time):
 
         if self.stim_configs['name'] == 'baseline':
             # using SingleTokenizer._tokenize
             trial_list = self._tokenize(None, None, rec_end_time=rec_end_time)
             return trial_list
 
-        mark_events = self.get_mark_events(mark_events, mark_time_series)
         mark_offset = self.stim_configs['mark_offset']      # from mark to actual stim onset
         stim_onsets = mark_events + mark_offset
 
@@ -61,40 +58,6 @@ class BaseTokenizer():
 
     def _tokenize(self, stim_vals, stim_onsets, **kwargs):
         raise NotImplementedError
-
-    def get_mark_events(self, mark_events, mark_time_series, use_tdt_mark_events=False):
-        if use_tdt_mark_events and mark_events is not None:
-            # loaded directly from TDT object
-            # (now suppressed by use_tdt_mark_events=False because wn2 requires re-detection)
-            logger.info('Using marker events directly loaded from TDT')
-            logger.debug(f'found {len(mark_events)} onsets from TDT-detected events')
-            return mark_events
-
-        logger.info('Detecting stimulus onsets by thresholding the mark track')
-        mark_rate = mark_time_series.rate
-        stim_duration = self.stim_configs.get('duration', None)
-        mark_threshold = self.stim_configs['mark_threshold']
-        mark_events = self._get_mark_events(mark_time_series.data[:],
-                                            mark_rate, mark_threshold,
-                                            min_separation=stim_duration)
-        logger.debug(f'found {len(mark_events)} onsets by thresholding mark track')
-        return mark_events
-
-    def _get_mark_events(self, mark_data, mark_rate, mark_threshold,
-                         min_separation=None):
-        mark_front_padded = np.concatenate((np.array([0.]), mark_data), axis=0)
-        thresh_crossings = np.diff((mark_front_padded > mark_threshold).astype('int'),
-                                   axis=0)
-        mark_events_idx = np.where(thresh_crossings > 0.5)[0]
-        mark_events = mark_events_idx / mark_rate
-
-        if min_separation is not None:
-            # if two adjacent marks are too close, drop the latter one
-            too_close = np.where((mark_events[1:] - mark_events[:-1])
-                                 < min_separation)[0] + 1
-            mark_events = np.delete(mark_events, too_close)
-
-        return mark_events
 
     def _validate_num_stim_onsets(self, stim_onsets):
         ''' Validate that the number of identified stim onsets
