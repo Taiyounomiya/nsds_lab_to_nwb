@@ -13,10 +13,13 @@
 #   metadata: (dict) what was previously in <stim_name>.yaml in metadata lib
 #       type: either 'discrete' or 'continuous'
 #       duration: stimulus duration, in seconds.
-#       baseline_start: start of each in-trial baseline period, in seconds,
-#           relative to stimulus onset.
+#           null means duration is variable (timit) or not relevant (baseline/dmr).
+#       baseline_start: start of each in-trial baseline period, in seconds.
+#           relative to stimulus onset (for tone and wn stimuli)
+#           or relative to the end of last stimulus trial (timit and dmr).
 #       baseline_end: end of each in-trial baseline period, in seconds,
-#           relative to stimulus onset.
+#           relative to stimulus onset (for tone and wn stimuli).
+#           if null, last baseline extends to the end of recording (timit/dmr).
 #       first_mark: time from start of audio file to the first mark, in seconds.
 #       back_pad: time from end-of-stim to end-of-audio-file, in seconds (dmr only).
 #       mark_offset: time from mark to actual stimulus onset, in seconds.
@@ -48,10 +51,8 @@ dmr:
     metadata:
         type: continuous
         duration: null
-        baseline_start: 3.0     # after the last stimulus trial
-        baseline_end: null      # no fixed end (through the end of recording)
-        # baseline_start: 0.0
-        # baseline_end: 0.0
+        baseline_start: 3.0         # legacy value: 0.0
+        baseline_end: null          # legacy value: 0.0
         first_mark: 10.0
         back_pad: 60.0
         mark_offset: 0.0
@@ -67,9 +68,8 @@ timit:
     metadata:
         type: discrete
         duration: null
-        baseline_start: 3.0     # after the last stimulus trial
-        baseline_end: null      # no fixed end (through the end of recording)
-        # baseline_end: 3.0
+        baseline_start: 3.0
+        baseline_end: null          # legacy value: 3.0
         nsamples: 998
         first_mark: 5.0
         mark_offset: 0.0
@@ -82,14 +82,12 @@ tone:
                  4800 trials with periodicity 0.3s (0.05s stimulus and 0.25s break).
     audio_path: 'Tone/stimulus_signal_03202013.wav'
     marker_path: 'Tone/stimulus_trigger_03202013.wav'
-    parameter_path: 'Tone/Tone.stimVls.mat'   # copied from mars.configs
+    parameter_path: 'Tone/Tone.stimVls.mat'
     metadata:
         type: discrete
         duration: 0.05
-        baseline_start: 0.15
-        baseline_end: 0.2
-        # baseline_start: 0.1
-        # baseline_end: 0.18
+        baseline_start: 0.15        # legacy value: 0.1
+        baseline_end: 0.2           # legacy value: 0.18
         nsamples: 4800
         first_mark: 5.0
         mark_offset: 0.0
@@ -106,12 +104,10 @@ tone150:
     metadata:
         type: discrete
         duration: 0.05
-        baseline_start: 0.15
-        baseline_end: 0.2
-        # baseline_start: 0.1
-        # baseline_end: 0.18
+        baseline_start: 0.15        # legacy value: 0.1
+        baseline_end: 0.2           # legacy value: 0.18
         nsamples: 4500
-        first_mark: 5.125       # 5.0
+        first_mark: 5.125           # fixed from 5.0
         mark_offset: 0.0
         mark_threshold: 0.3
 
@@ -126,14 +122,12 @@ tone_diagnostic:
     metadata:
         type: discrete
         duration: 0.05
-        baseline_start: 0.15
-        baseline_end: 0.2
-        # baseline_start: 0.1
-        # baseline_end: 0.18
+        baseline_start: 0.15        # legacy value: 0.1
+        baseline_end: 0.2           # legacy value: 0.18
         nsamples: 300
         first_mark: 5.0
         mark_offset: 0.125
-        mark_threshold: 1000        # 0.3
+        mark_threshold: 1000        # fixed from 0.3
 
 
 wn2:
@@ -146,11 +140,9 @@ wn2:
     metadata:
         type: discrete
         duration: 0.1
-        baseline_start: 0.5
-        baseline_end: 0.6
-        # baseline_start: 0.3
-        # baseline_end: 0.5
+        baseline_start: 0.5         # legacy value: 0.3
+        baseline_end: 0.6           # legacy value: 0.5
         nsamples: 60
         first_mark: 0.0
         mark_offset: 0.25
-        mark_threshold: 0.1         # 0.3
+        mark_threshold: 0.1         # fixed from 0.3
