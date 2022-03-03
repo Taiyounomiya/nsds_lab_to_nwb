@@ -1,8 +1,6 @@
 import logging.config
 from pynwb.ecephys import ElectricalSeries
 
-from nsds_lab_to_nwb.tools.htk.htk_reader import HTKReader
-from nsds_lab_to_nwb.tools.tdt.tdt_reader import TDTReader
 from process_nwb.resample import resample
 
 logger = logging.getLogger(__name__)
@@ -10,19 +8,12 @@ logger.setLevel(logging.DEBUG)
 
 
 class NeuralDataOriginator():
-    def __init__(self, dataset, metadata, resample_flag=True):
-        self.dataset = dataset      # this should have all relavant paths
+    def __init__(self, rec_manager, metadata, resample_flag=True):
+        self.rec_manager = rec_manager
         self.metadata = metadata    # this should have all relevant metadata
         self.resample_flag = resample_flag
         self.hardware_rate = None
         self.resample_rate = None
-
-        if hasattr(self.dataset, 'htk_mark_path'):
-            logger.info('Using HTK')
-            self.neural_data_reader = HTKReader(self.dataset.htk_path)
-        else:
-            logger.info('Using TDT')
-            self.neural_data_reader = TDTReader(self.dataset.tdt_path)
 
     def make(self, nwb_content, electrode_table_regions):
         for device_name, dev_conf in self.metadata['device'].items():
@@ -30,7 +21,7 @@ class NeuralDataOriginator():
                 continue
 
             logger.info(f'Extracting {device_name} data...')
-            data, metadata = self.neural_data_reader.get_data(stream=device_name, dev_conf=dev_conf)
+            data, metadata = self.rec_manager.read_neural_data(stream=device_name, dev_conf=dev_conf)
             if data is None:
                 logger.info(f'No data available for {device_name}. Skipping...')
             else:

@@ -3,40 +3,20 @@ import numpy as np
 
 from pynwb import TimeSeries
 
-from nsds_lab_to_nwb.tools.htk.readers.htkfile import HTKFile
-from nsds_lab_to_nwb.tools.tdt.tdt_reader import TDTReader
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
 class MarkManager():
-    def __init__(self, dataset, stim_configs, use_tdt_mark_events=False):
-        self.dataset = dataset
+    def __init__(self, rec_manager, stim_configs, use_tdt_mark_events=False):
+        self.rec_manager = rec_manager
         self.stim_configs = stim_configs
         self.mark_obj_name = 'stim_onset_marks'  # 'recorded_mark' (previous name)
         self.use_tdt_mark_events = use_tdt_mark_events
 
     def get_mark_track(self):
-        # Read the mark track
-        if hasattr(self.dataset, 'htk_mark_path'):
-            mark_file = HTKFile(self.dataset.htk_mark_path)
-            mark_track, meta = mark_file.read_data()
-            rate = mark_file.sample_rate
-            mark_events = None
-        else:
-            tdt_reader = TDTReader(self.dataset.tdt_path)
-            mark_track, meta = tdt_reader.get_data(stream='mrk1')
-            rate = meta['sample_rate']
-            mark_events = None
-            if self.use_tdt_mark_events:
-                try:
-                    mark_events = tdt_reader.get_events()
-                except AttributeError:
-                    # there is no mark for baseline (no stimulus) block
-                    mark_events = None
-
-        # Create the mark timeseries
+        # read recorded mark tracks, and create the mark timeseries
+        mark_track, rate = self.rec_manager.read_marks()
         starting_time = 0.0    # because this is recorded mark, always starting at rec t=0
         mark_time_series = TimeSeries(name=self.mark_obj_name,
                                       data=mark_track,
@@ -46,6 +26,10 @@ class MarkManager():
                                       description='Recorded mark that tracks stimulus onsets.')
 
         # detect marked event times
+        if self.rec_manager.rec_source == 'tdt' and self.use_tdt_mark_events:
+            mark_events = self.rec_manager.read_mark_events()
+        else:
+            mark_events = None
         mark_events = self.get_mark_events(mark_events, mark_time_series)
 
         return mark_time_series, mark_events

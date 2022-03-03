@@ -12,20 +12,18 @@ logger.setLevel(logging.INFO)
 
 
 class StimulusOriginator():
-    def __init__(self, dataset, metadata):
-        self.dataset = dataset
-        self.metadata = metadata
-        self.stim_lib_path = get_stim_lib_path(self.dataset.stim_lib_path)
-        self.stim_configs = self.metadata['stimulus']
+    def __init__(self, rec_manager, dataset, metadata):
+        self.stim_lib_path = get_stim_lib_path(dataset.stim_lib_path)
+        self.stim_configs = metadata['stimulus']
 
-        self.mark_manager = MarkManager(self.dataset, self.stim_configs)
+        self.mark_manager = MarkManager(rec_manager, self.stim_configs)
         self.wav_manager = WavManager(self.stim_lib_path,
                                       self.stim_configs)
 
         self.stim_configs['stim_params_path'] = self._get_stim_parameter_path()
         self.stim_configs['play_length'] = self.wav_manager.length
 
-        self.trials_manager = TrialsManager(self.metadata['block_name'],
+        self.trials_manager = TrialsManager(metadata['block_name'],
                                             self.stim_configs)
 
     def _get_stim_parameter_path(self):

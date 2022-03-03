@@ -8,6 +8,7 @@ from pynwb import NWBHDF5IO, NWBFile
 from pynwb.file import Subject
 
 from nsds_lab_to_nwb.common.data_scanners import AuditoryDataScanner
+from nsds_lab_to_nwb.common.rec_manager import RecManager
 from nsds_lab_to_nwb.common.time import (get_current_time, get_default_time,
                                          validate_time)
 from nsds_lab_to_nwb.components.electrode.electrodes_originator import ElectrodesOriginator
@@ -75,8 +76,8 @@ class NWBBuilder:
 
         self.source_script, self.source_script_file_name = self._get_source_script()
 
-        logger.info('==================================')
-        logger.info(f'Processing block {block_folder}.')
+        logger.info('=======================================')
+        logger.info(f'Building NWB for block {block_folder}.')
 
         logger.info('Collecting metadata for NWB conversion...')
         self.metadata = self._collect_nwb_metadata()
@@ -95,11 +96,16 @@ class NWBBuilder:
         os.makedirs(rat_out_dir, exist_ok=True)
         self.output_file = os.path.join(rat_out_dir, f'{self.block_folder}.nwb')
 
+        logger.info('Initializing recordings manager...')
+        self.rec_manager = RecManager(self.dataset)
+
         logger.info('Creating originator instances...')
         self.electrodes_originator = ElectrodesOriginator(self.metadata)
-        self.neural_data_originator = NeuralDataOriginator(self.dataset, self.metadata,
+        self.neural_data_originator = NeuralDataOriginator(self.rec_manager,
+                                                           self.metadata,
                                                            resample_flag=self.resample_data)
-        self.stimulus_originator = StimulusOriginator(self.dataset, self.metadata)
+        self.stimulus_originator = StimulusOriginator(self.rec_manager,
+                                                      self.dataset, self.metadata)
 
         logger.info('Extracting session start time...')
         self.session_start_time = self._extract_session_start_time()
@@ -167,14 +173,15 @@ class NWBBuilder:
         return data_scanner.extract_dataset()
 
     def _extract_session_start_time(self):
-        if self.use_htk:
-            logger.info(' - Using a dummy session_start_time (HTK pipeline)')
+        recorded_metadata = self.rec_manager.read_info()
+        try:
+            # extract from TDT data
+            session_start_time = recorded_metadata['start_date']
+            return validate_time(session_start_time)
+        except TypeError:
+            # if HTK, recorded_metadata is None
+            logger.info(' - start_date not available (e.g. HTK). Using a dummy session_start_time')
             return get_default_time()
-
-        # extract from TDT data
-        recorded_metadata = self.neural_data_originator.neural_data_reader.tdt_obj['info']
-        session_start_time = recorded_metadata['start_date']
-        return validate_time(session_start_time)
 
     def _add_extra_metadata(self, nwb_content):
         # temporary solution: add as scratch data
