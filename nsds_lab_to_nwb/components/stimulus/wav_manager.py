@@ -1,6 +1,7 @@
 import logging
 import os
-from scipy.io import wavfile
+
+from nsds_lab_to_nwb.components.stimulus.utils import read_wav
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +28,7 @@ class WavManager():
     def load_stim_from_wav_file(self):
         # Read the stimulus wav file
         logger.debug(f'Loading stimulus from: {self.stim_file}')
-        stim_wav_fs, stim_wav = wavfile.read(self.stim_file)
-        rate = float(stim_wav_fs)
-        length = stim_wav.shape[0] / rate
+        stim_wav, rate, length = read_wav(self.stim_file)
         return stim_wav, rate, length
 
     def _get_audio_path(self):
