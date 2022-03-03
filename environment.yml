@@ -18,7 +18,7 @@ dependencies:
   - h5py
   - hdmf
   - hdf5
-  - pynwb
+  - pynwb>=1.5.1
   - pyyaml
   - imageio
   - pytest

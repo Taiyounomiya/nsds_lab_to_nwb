@@ -59,18 +59,14 @@ class MetadataReader:
         return self.metadata_input
 
     def load_metadata_source(self):
-        try:
-            metadata_input = read_yaml(self.block_metadata_path)
-        except FileNotFoundError:
-            # first generate the block metadata file
-            block_path_full, block_metadata_file = os.path.split(self.block_metadata_path)
-            experiment_path, _ = os.path.split(block_path_full)
-            block_folder, ext = os.path.splitext(block_metadata_file)
-            logger.debug(f'Looking for an experiment note file in {experiment_path}...')
-            reader = ExpNoteReader(experiment_path, block_folder)
-            reader.dump_yaml(write_path=self.block_metadata_path)
-            # then try reading again
-            metadata_input = read_yaml(self.block_metadata_path)
+        # first generate the block metadata file
+        block_path_full, block_metadata_file = os.path.split(self.block_metadata_path)
+        experiment_path, _ = os.path.split(block_path_full)
+        block_folder, ext = os.path.splitext(block_metadata_file)
+        logger.debug(f'Looking for an experiment note file in {experiment_path}...')
+        reader = ExpNoteReader(experiment_path, block_folder)
+        reader.dump_yaml(write_path=self.block_metadata_path)
+        metadata_input = reader.get_nsds_meta()
         return metadata_input
 
     def parse(self):
@@ -265,6 +261,7 @@ class LegacyMetadataReader(MetadataReader):
         # TODO: separate (experiment, device) metadata library as legacy
         self.legacy_lib_path = os.path.join(self.metadata_lib_path, self.experiment_type, 'legacy')
 
+    
     def load_metadata_source(self):
         # direct input from the block yaml file (not yet expanded)
         metadata_input = read_yaml(self.block_metadata_path)
