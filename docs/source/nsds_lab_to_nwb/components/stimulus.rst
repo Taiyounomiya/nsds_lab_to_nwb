@@ -21,11 +21,6 @@ components.stimulus API
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: nsds_lab_to_nwb.components.stimulus.stim_value_extractor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. automodule:: nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer
    :members:
    :undoc-members:

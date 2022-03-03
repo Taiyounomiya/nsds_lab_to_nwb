@@ -1,8 +1,7 @@
 import logging
-import numpy as np
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 
 
 class BaseTokenizer():
@@ -14,63 +13,58 @@ class BaseTokenizer():
 
         self.tokenizer_type = 'BaseTokenizer'
         self.custom_trial_columns = None
+        self.audio_start_time = None
 
-    def tokenize(self, mark_onsets, mark_time_series, stim_vals,
-                 audio_play_length=None):
-        ''' audio_play_length: length of raw audio file. added for TIMIT
-        '''
-        stim_onsets = self.get_stim_onsets(mark_onsets, mark_time_series)
-        self._validate_num_stim_onsets(stim_vals, stim_onsets)
-        rec_end_time = mark_time_series.num_samples / mark_time_series.rate
+    def tokenize(self, mark_events, rec_end_time):
+
+        if self.stim_configs['name'] == 'baseline':
+            # using SingleTokenizer._tokenize
+            trial_list = self._tokenize(None, None, rec_end_time=rec_end_time)
+            return trial_list
+
+        mark_offset = self.stim_configs['mark_offset']      # from mark to actual stim onset
+        stim_onsets = mark_events + mark_offset
+
+        stim_start_time = stim_onsets[0]
+        audio_start_time = mark_events[0] - self.stim_configs['first_mark']
+        audio_end_time = audio_start_time + self.stim_configs['play_length']
+        last_marker_time = mark_events[-1]
+
+        stim_name = self.stim_configs['name']
+        logger.debug(f'Tokenizing {stim_name} stimulus.')
+        logger.debug(f'audio file start time: {audio_start_time}')
+        logger.debug(f'stim onset: {stim_start_time}')
+        logger.debug(f'last marker: {last_marker_time}')
+        logger.debug(f'audio file end time: {audio_end_time} ')
+        logger.debug(f'recording end time: {rec_end_time}')
+
+        self._validate_num_stim_onsets(stim_onsets)
+        self.audio_start_time = audio_start_time
+
+        stim_vals = self._load_stim_parameters()
+        if stim_vals is not None:
+            if len(stim_vals) != self.stim_configs['nsamples']:
+                raise ValueError('incorrect number of stimulus parameter sets found.')
+
         trial_list = self._tokenize(stim_vals, stim_onsets,
-                                    stim_dur=self.stim_configs['duration'],
-                                    bl_start=self.stim_configs['baseline_start'],
-                                    bl_end=self.stim_configs['baseline_end'],
-                                    audio_play_length=audio_play_length,
+                                    audio_start_time=audio_start_time,
+                                    audio_end_time=audio_end_time,
                                     rec_end_time=rec_end_time)
         return trial_list
 
-    def _tokenize(self, stim_vals, stim_onsets,
-                  *, stim_dur, bl_start, bl_end, rec_end_time):
+    def _load_stim_parameters(self):
+        # override in Tone and TIMIT tokenizers
+        return None
+
+    def _tokenize(self, stim_vals, stim_onsets, **kwargs):
         raise NotImplementedError
 
-    def get_stim_onsets(self, mark_onsets, mark_time_series):
-        mark_offset = self.stim_configs['mark_offset']
-        if mark_onsets is not None:
-            # loaded directly from TDT object
-            logger.info('Using stimulus onsets directly loaded from TDT')
-            return mark_onsets + mark_offset
-
-        logger.info('Detecting stimulus onsets by thresholding the mark track')
-        mark_fs = mark_time_series.rate
-        mark_threshold = self._get_mark_threshold()
-        stim_onsets_idx = self._get_stim_onsets(mark_time_series, mark_threshold)
-        stim_onsets = (stim_onsets_idx / mark_fs) + mark_offset
-        return stim_onsets
-
-    def _get_stim_onsets(self, mark_time_series, mark_threshold):
-        mark_data = mark_time_series.data[:]
-        thresh_crossings = np.diff((mark_data > mark_threshold).astype('int'),
-                                   axis=0)
-
-        # adding +1 because diff gets rid of the 1st datapoint
-        stim_onsets_idx = np.where(thresh_crossings > 0.5)[0] + 1
-        logger.debug(f'found {len(stim_onsets_idx)} onsets')
-        return stim_onsets_idx
-
-    def _get_mark_threshold(self):
-        # NOTE: this is only used when TDT-loaded mark onsets are not available.
-        # see issue #102 for more discussion on mark thresholds.
-        mark_threshold = self.stim_configs['mark_threshold']
-        logger.debug(f'using mark_threshold={mark_threshold} from metadata input')
-        return mark_threshold
-
-    def _validate_num_stim_onsets(self, stim_vals, stim_onsets):
+    def _validate_num_stim_onsets(self, stim_onsets):
         ''' Validate that the number of identified stim onsets
-        is equal to the number of stim parameterizations in stim_vals.
+        is equal to the known number of stimulus trials.
         '''
         num_onsets = len(stim_onsets)
-        num_expected_trials = len(stim_vals)
+        num_expected_trials = self.stim_configs['nsamples']
         mismatch_msg = (
             f"{self.tokenizer_type}: "
             + "Incorrect number of stimulus onsets found "

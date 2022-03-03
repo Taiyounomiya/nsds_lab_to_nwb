@@ -11,6 +11,11 @@ Common API
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: nsds_lab_to_nwb.common.rec_manager
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
 .. automodule:: nsds_lab_to_nwb.common.time
   :members:
   :undoc-members:

@@ -3,10 +3,7 @@ from nsds_lab_to_nwb.components.stimulus.tokenizers.base_tokenizer import BaseTo
 
 class TIMITTokenizer(BaseTokenizer):
     """
-    Tokenize TIMIT stimulus data
-
-    Original version author: Max Dougherty <maxdougherty@lbl.gov>
-    As part of MARS
+    Tokenize into TIMIT stimulus trials.
     """
     def __init__(self, block_name, stim_configs):
         BaseTokenizer.__init__(self, block_name, stim_configs)
@@ -16,14 +13,18 @@ class TIMITTokenizer(BaseTokenizer):
         self.custom_trial_columns = [('sb', 'Stimulus (s) or baseline (b) period'),
                                      ('sample_filename', 'Sample Filename')]
 
+    def _load_stim_parameters(self):
+        stim_params_path = self.stim_configs['stim_params_path']
+        stim_vals = timit_stimulus_values(stim_params_path)
+        return stim_vals
+
     def _tokenize(self, stim_vals, stim_onsets,
-                  *, audio_play_length, rec_end_time, **unused_metadata):
-        first_mark = self.stim_configs['first_mark']
-        audio_end_time = (stim_onsets[0] - first_mark) + audio_play_length
+                  *, audio_start_time, audio_end_time, rec_end_time):
+        bl_start = self.stim_configs['baseline_start']
 
         trial_list = []
 
-        # Add the pre-stimulus period to baseline
+        # period before the first stimulus starts
         trial_list.append(dict(start_time=0.0,
                                stop_time=stim_onsets[0],
                                sb='b',
@@ -40,10 +41,31 @@ class TIMITTokenizer(BaseTokenizer):
                                    sb='s',
                                    sample_filename=filename))
 
-        # Add the period after the last stimulus to baseline
-        trial_list.append(dict(start_time=audio_end_time,
-                               stop_time=rec_end_time,
-                               sb='b',
-                               sample_filename='none'))
+        # period after the end of last stim trial until recording stops
+        start_time = audio_end_time + bl_start
+        if start_time < rec_end_time:
+            trial_list.append(dict(start_time=start_time,
+                                   stop_time=rec_end_time,
+                                   sb='b',
+                                   sample_filename='none'))
 
         return trial_list
+
+
+def timit_stimulus_values(file_path):
+    """adapted from mars.configs.block_directory
+
+    Parameters
+    -----------
+    file_path : full path to a .txt file that contains a list of filenames
+
+    Returns
+    --------
+    stim_vals: list of str
+        each item is a .wav file name in TIMIT.
+    """
+    # expecting a text file, one .wav filename string per row
+    with open(file_path) as f:
+        lines = f.readlines()
+    stim_vals = [line.rstrip(' \n') for line in lines]
+    return stim_vals

@@ -6,6 +6,7 @@ from nsds_lab_to_nwb.components.stimulus.tokenizers.timit_tokenizer import TIMIT
 from nsds_lab_to_nwb.components.stimulus.tokenizers.wn_tokenizer import WNTokenizer
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class TrialsManager():
@@ -23,22 +24,21 @@ class TrialsManager():
         elif 'wn' in stim_name:
             self.tokenizer = WNTokenizer(self.block_name, self.stim_configs)
         else:
-            raise ValueError(f"Unknown stimulus type '{stim_name}' for mark tokenizer")
+            raise ValueError(f"Unknown stimulus type '{stim_name}' for trialization")
+
+        logger.info(f'Stimulus {stim_name}: using {self.tokenizer.tokenizer_type}.')
 
         self.custom_trial_columns = self.tokenizer.custom_trial_columns
         if self.custom_trial_columns is None:
             raise ValueError('self.custom_trial_columns should be set by the stim-specific tokenizer.')
 
-    def add_trials(self, nwb_content, mark_onsets, stim_vals,
-                   *, audio_play_length, mark_obj_name='recorded_mark'):
+    def add_trials(self, nwb_content, mark_events, rec_end_time):
         if self._already_tokenized(nwb_content):
             logger.info('Block has already been tokenized')
             return
 
         # tokenize to identify trials
-        mark_time_series = self.read_mark(nwb_content, mark_obj_name)
-        trial_list = self.tokenizer.tokenize(mark_onsets, mark_time_series, stim_vals,
-                                             audio_play_length=audio_play_length)
+        trial_list = self.tokenizer.tokenize(mark_events, rec_end_time)
 
         # add trial columns, then add trials
         for column_args in self.custom_trial_columns:
@@ -55,5 +55,10 @@ class TrialsManager():
                                     for column_args in self.custom_trial_columns)
         return all(has_custom_trial_columns)
 
-    def read_mark(self, nwb_content, mark_obj_name):
-        return nwb_content.stimulus[mark_obj_name]
+    def get_audio_start_time(self):
+        audio_start_time = self.tokenizer.audio_start_time
+        if audio_start_time is None:
+            if self.stim_configs['name'] == 'baseline':
+                return 0.0
+            raise ValueError('audio_start_time should be set in the tokenizer.')
+        return audio_start_time
