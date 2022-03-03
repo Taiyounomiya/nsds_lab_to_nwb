@@ -87,8 +87,10 @@ tone:
     metadata:
         type: discrete
         duration: 0.05
-        baseline_start: 0.1
-        baseline_end: 0.18
+        baseline_start: 0.15
+        baseline_end: 0.2
+        # baseline_start: 0.1
+        # baseline_end: 0.18
         nsamples: 4800
         first_mark: 5.0
         mark_offset: 0.0
@@ -105,8 +107,10 @@ tone150:
     metadata:
         type: discrete
         duration: 0.05
-        baseline_start: 0.1
-        baseline_end: 0.18
+        baseline_start: 0.15
+        baseline_end: 0.2
+        # baseline_start: 0.1
+        # baseline_end: 0.18
         nsamples: 4500
         first_mark: 5.125       # 5.0
         mark_offset: 0.0
@@ -123,8 +127,10 @@ tone_diagnostic:
     metadata:
         type: discrete
         duration: 0.05
-        baseline_start: 0.1
-        baseline_end: 0.18
+        baseline_start: 0.15
+        baseline_end: 0.2
+        # baseline_start: 0.1
+        # baseline_end: 0.18
         nsamples: 300
         first_mark: 5.0
         mark_offset: 0.125
@@ -141,8 +147,10 @@ wn2:
     metadata:
         type: discrete
         duration: 0.1
-        baseline_start: 0.3
-        baseline_end: 0.5
+        baseline_start: 0.5
+        baseline_end: 0.6
+        # baseline_start: 0.3
+        # baseline_end: 0.5
         nsamples: 60
         first_mark: 0.0
         mark_offset: 0.25
