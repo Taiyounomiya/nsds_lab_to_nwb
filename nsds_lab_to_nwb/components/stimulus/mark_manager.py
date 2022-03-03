@@ -34,6 +34,8 @@ class MarkManager():
             return mark_events_input
 
         logger.info('Detecting stimulus onsets by thresholding the mark track')
+        # note: the min_separation condition is probably not required,
+        # although it doesn't hurt to keep
         stim_duration = self.stim_configs.get('duration', None)
         mark_threshold = self.stim_configs['mark_threshold']
         mark_events = detect_events(mark_data, mark_rate, mark_threshold,

@@ -134,7 +134,7 @@ tone_diagnostic:
         nsamples: 300
         first_mark: 5.0
         mark_offset: 0.125
-        mark_threshold: 1000        # fixed from 0.3
+        mark_threshold: 0.3
 
 
 wn2:
