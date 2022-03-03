@@ -523,6 +523,7 @@ class MetadataManager:
         # stimulus metadata now included in list_of_stimuli in this package
         stimulus_metadata['name'] = stim_name
         stimulus_metadata.update(**stim_info['metadata'])
+        stimulus_metadata.update(**stim_info['paths'])
 
     def __load_probes(self, device_metadata):
         e_id_gen = itertools.count()    # Electrode ID, unique for channels across devices
