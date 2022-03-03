@@ -2,8 +2,6 @@ import logging
 import os
 from scipy.io import wavfile
 
-from pynwb import TimeSeries
-
 from nsds_lab_to_nwb.metadata.stim_name_helper import check_stimulus_name
 from nsds_lab_to_nwb.utils import get_stim_lib_path
 
@@ -20,22 +18,13 @@ class WavManager():
         if self.stim_file is not None:
             self.stim_wav, self.rate, self.length = self.load_stim_from_wav_file()
 
-        self.stim_wav_obj_name = 'stim_waveform'  # 'raw_stimulus' (previous name)
-
-    def get_stim_wav(self, starting_time):
+    def get_stim_wav(self):
         if self.stim_file is None:
             logger.info(f'Stimulus [{self.stim_name}] has no audio file. ' +
                         'No stimulus will be added to the NWB file.')
-            return None
+            return None, None
 
-        # Create the stimulus timeseries
-        stim_time_series = TimeSeries(name=self.stim_wav_obj_name,
-                                      data=self.stim_wav,
-                                      starting_time=starting_time,
-                                      unit='Volts',
-                                      rate=self.rate,
-                                      description='Auditory stimulus waveform, aligned to neural recording.')
-        return stim_time_series
+        return self.stim_wav, self.rate
 
     def load_stim_from_wav_file(self):
         # Read the stimulus wav file

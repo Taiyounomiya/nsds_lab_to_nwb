@@ -1,6 +1,8 @@
 import logging
 import os
 
+from pynwb import TimeSeries
+
 from nsds_lab_to_nwb.components.stimulus.mark_manager import MarkManager
 from nsds_lab_to_nwb.components.stimulus.trials_manager import TrialsManager
 from nsds_lab_to_nwb.components.stimulus.wav_manager import WavManager
@@ -39,9 +41,16 @@ class StimulusOriginator():
         stim_type = self.stim_configs['type']  # either 'discrete' or 'continuous'
         logger.info(f'Stimulus name: {stim_name} (type: {stim_type})')
 
-        # add mark track
+        # add recorded mark timeseries
         logger.info('Adding marks...')
-        mark_time_series, mark_events = self.mark_manager.get_mark_track()
+        mark_start_time = 0.0    # start at rec start, because this is *recorded* mark
+        mark_track, mark_rate, mark_events = self.mark_manager.get_mark_track()
+        mark_time_series = TimeSeries(name='stim_onset_marks',  # previously 'recorded_mark'
+                                      data=mark_track,
+                                      unit='Volts',
+                                      starting_time=mark_start_time,
+                                      rate=mark_rate,
+                                      description='Recorded mark that tracks stimulus onsets.')
         nwb_content.add_stimulus(mark_time_series)
 
         # tokenize into trials, based on the mark track
@@ -49,9 +58,15 @@ class StimulusOriginator():
         rec_end_time = mark_time_series.num_samples / mark_time_series.rate
         self.trials_manager.add_trials(nwb_content, mark_events, rec_end_time)
 
-        # add stimulus WAV data
+        # add auditory stimulus WAV data
         logger.info('Adding stimulus waveform...')
-        audio_start_time = self.trials_manager.get_audio_start_time()
-        stim_wav_time_series = self.wav_manager.get_stim_wav(starting_time=audio_start_time)
-        if stim_wav_time_series is not None:
-            nwb_content.add_stimulus(stim_wav_time_series)
+        audio_start_time = self.trials_manager.get_audio_start_time()  # audio played after rec start
+        stim_wav, stim_rate = self.wav_manager.get_stim_wav()
+        if stim_wav is not None:
+            stim_time_series = TimeSeries(name='stim_waveform',  # previously 'raw_stimulus'
+                                          data=stim_wav,
+                                          starting_time=audio_start_time,
+                                          unit='Volts',
+                                          rate=stim_rate,
+                                          description='Auditory stimulus waveform, aligned to neural recording.')
+            nwb_content.add_stimulus(stim_time_series)
