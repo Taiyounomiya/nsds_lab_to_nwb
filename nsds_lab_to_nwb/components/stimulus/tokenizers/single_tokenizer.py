@@ -39,6 +39,7 @@ class SingleTokenizer(BaseTokenizer):
 
         # -- in case of continuous stimulus, such as DMR --
         stim_start_time = stim_onsets[0]
+        bl_start = self.stim_configs['baseline_start']
         back_pad = self.stim_configs.get('back_pad', 0.0)   # for DMR stimulus
 
         trial_list = []
@@ -57,8 +58,9 @@ class SingleTokenizer(BaseTokenizer):
                                stim_name=stim_name))
 
         # add post-stimulus period to baseline
-        if stim_stop_time < rec_end_time:
-            trial_list.append(dict(start_time=stim_stop_time,
+        start_time = stim_stop_time + bl_start
+        if start_time < rec_end_time:
+            trial_list.append(dict(start_time=start_time,
                                    stop_time=rec_end_time,
                                    sb='b',
                                    stim_name=''))

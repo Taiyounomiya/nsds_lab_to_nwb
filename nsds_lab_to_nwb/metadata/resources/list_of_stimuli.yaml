@@ -48,8 +48,8 @@ dmr:
     metadata:
         type: continuous
         duration: null
-        baseline_start: null
-        baseline_end: null
+        baseline_start: 3.0     # after the last stimulus trial
+        baseline_end: null      # no fixed end (through the end of recording)
         # baseline_start: 0.0
         # baseline_end: 0.0
         first_mark: 10.0
@@ -67,9 +67,8 @@ timit:
     metadata:
         type: discrete
         duration: null
-        baseline_start: null
-        baseline_end: null
-        # baseline_start: 3.0
+        baseline_start: 3.0     # after the last stimulus trial
+        baseline_end: null      # no fixed end (through the end of recording)
         # baseline_end: 3.0
         nsamples: 998
         first_mark: 5.0
