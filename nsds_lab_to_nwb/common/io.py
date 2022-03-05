@@ -5,6 +5,10 @@ import csv
 import h5py
 import scipy.io
 from collections import OrderedDict
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 # --- yaml ---
@@ -20,11 +24,14 @@ def write_yaml(yml_path, data, access_mode='w', default_flow_style=False, sort_k
     od_representer = (lambda dumper, data:
                       dumper.represent_mapping('tag:yaml.org,2002:map', data.items()))
     yaml.add_representer(OrderedDict, od_representer)
-    with io.open(yml_path, access_mode) as fh:
-        yaml.dump(data, fh,
-                  Dumper=MyDumper,
-                  default_flow_style=default_flow_style,
-                  sort_keys=sort_keys)
+    try:
+        with io.open(yml_path, access_mode) as fh:
+            yaml.dump(data, fh,
+                      Dumper=MyDumper,
+                      default_flow_style=default_flow_style,
+                      sort_keys=sort_keys)
+    except PermissionError:
+        logger.debug(f'Failed to write yaml due to permissions error in {yml_path}')
 
 
 def read_yaml(file_path):
