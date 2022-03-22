@@ -16,5 +16,7 @@ def check_stimulus_name(stim_name_input):
 
 
 def get_stimulus_metadata(stim_name_input):
-    _, stim_info = check_stimulus_name(stim_name_input)
-    return stim_info
+    stim_name, stim_info = check_stimulus_name(stim_name_input)
+    stim_info_full = {'name': stim_name}
+    stim_info_full.update(**stim_info)
+    return stim_info_full
