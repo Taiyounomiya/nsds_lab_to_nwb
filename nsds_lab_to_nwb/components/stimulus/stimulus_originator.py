@@ -28,7 +28,6 @@ class StimulusOriginator():
                                             self.stim_configs)
 
     def _get_stim_parameter_path(self):
-        stim_name = self.stim_configs['name']
         parameter_path = self.stim_configs['parameter_path']
         if parameter_path is None or len(parameter_path) == 0:
             return None

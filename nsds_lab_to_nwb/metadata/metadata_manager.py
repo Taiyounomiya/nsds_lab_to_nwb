@@ -261,7 +261,6 @@ class LegacyMetadataReader(MetadataReader):
         # TODO: separate (experiment, device) metadata library as legacy
         self.legacy_lib_path = os.path.join(self.metadata_lib_path, self.experiment_type, 'legacy')
 
-    
     def load_metadata_source(self):
         # direct input from the block yaml file (not yet expanded)
         metadata_input = read_yaml(self.block_metadata_path)
