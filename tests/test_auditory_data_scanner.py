@@ -9,6 +9,7 @@ data_path = '/clusterfs/NSDS_data/hackathon20201201/'
 # new base?
 data_path_tdt = '/clusterfs/NSDS_data/hackathon20201201/TTankBackup/'
 
+
 @pytest.mark.xfail
 def test_auditory_data_scanner_case1_old_data(self):
     ''' scan data_path and identify relevant subdirectories '''
@@ -21,6 +22,7 @@ def test_auditory_data_scanner_case1_old_data(self):
     dataset = data_scanner.extract_dataset()
     if not isinstance(dataset, Dataset):
         raise TypeError('expecting a custom Dataset object')
+
 
 @pytest.mark.xfail
 def test_auditory_data_scanner_case2_new_data(self):

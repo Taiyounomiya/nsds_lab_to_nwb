@@ -99,7 +99,8 @@ class MetadataReader:
 
         if 'session_description' not in self.metadata_input:
             try:
-                self.metadata_input['session_description'], _ = check_stimulus_name(self.metadata_input['stimulus']['name'])
+                name = self.metadata_input['stimulus']['name']
+                self.metadata_input['session_description'], _ = check_stimulus_name(name)
             except (KeyError, ValueError):
                 self.metadata_input['session_description'] = 'Unknown stimulus'
 

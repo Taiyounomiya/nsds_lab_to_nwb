@@ -17,7 +17,8 @@ def test_get_stim_files():
     # note: get_stim_file() is a staticmethod
     wm = WavManager(stim_path, stim_metadata)
     for st_name in ('White noise', 'wn2'):
-        wm.get_stim_file(st_name, self.stim_path)
+        wm.get_stim_file(st_name, stim_path)
+
 
 @pytest.mark.xfail
 def test_get_stim_wav():

@@ -1,4 +1,3 @@
-import unittest
 import os
 import uuid
 
@@ -18,11 +17,13 @@ data_path = get_data_path()
 metadata_lib_path = get_metadata_lib_path()
 stim_lib_path = get_stim_lib_path()
 
+
 @pytest.mark.xfail
 def test_wn_tokenizer(self):
     ''' test white noise stimulus tokenizer '''
     block_name = 'RVG16_B01'
     self.__run_test_tokenizer(block_name)
+
 
 @pytest.mark.xfail
 def test_tone_tokenizer(self):
@@ -30,11 +31,13 @@ def test_tone_tokenizer(self):
     block_name = 'RVG16_B06'
     self.__run_test_tokenizer(block_name)
 
+
 @pytest.mark.xfail
 def test_timit_tokenizer(self):
     ''' test TIMIT stimulus tokenizer '''
     block_name = 'RVG16_B08'
     self.__run_test_tokenizer(block_name)
+
 
 def __run_test_tokenizer(self, block_name):
     _, animal_name, _ = split_block_folder(block_name)
@@ -45,7 +48,8 @@ def __run_test_tokenizer(self, block_name):
                                metadata_lib_path=self.metadata_lib_path,
                                legacy_block=False).extract_metadata()
     stim_configs = metadata['stimulus']
-    stim_vals = StimValueExtractor(stim_configs, self.stim_lib_path).extract()
+    stim_vals = None
+    # stim_vals = StimValueExtractor(stim_configs, self.stim_lib_path).extract()
 
     dataset = AuditoryDataScanner(block_name,
                                   data_path=self.data_path,

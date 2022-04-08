@@ -7,6 +7,7 @@ import pytest
 metadata_lib_path = get_metadata_lib_path()
 metadata_save_path = '_test/'
 
+
 @pytest.mark.xfail
 def test_metadata_manager_case1_old_data():
     ''' detect/collect metadata needed to build the NWB file '''
@@ -17,6 +18,7 @@ def test_metadata_manager_case1_old_data():
                                    metadata_lib_path=metadata_lib_path,
                                    metadata_save_path=metadata_save_path)
     nwb_metadata.extract_metadata()
+
 
 @pytest.mark.xfail
 def test_metadata_manager_case2_new_data():

@@ -8,6 +8,7 @@ data_path = get_data_path()
 metadata_save_path = '_test/'
 out_path = '_test/'
 
+
 @pytest.mark.xfail
 def test_build_nwb_single_block(self):
     ''' build NWB but do not write file to disk '''
@@ -16,6 +17,7 @@ def test_build_nwb_single_block(self):
     # resample_data = True
     use_htk = False
     self.__build_nwb_content(block_folder, resample_data, use_htk)
+
 
 def __build_nwb_content(self, block_folder, resample_data=True, use_htk=False):
     ''' build NWB but do not write file to disk '''
