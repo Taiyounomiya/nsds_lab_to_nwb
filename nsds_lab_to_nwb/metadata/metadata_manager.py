@@ -99,9 +99,10 @@ class MetadataReader:
 
         if 'session_description' not in self.metadata_input:
             try:
-                self.metadata_input['session_description'] = self.metadata_input['stimulus']['name']
-            except KeyError:
-                self.metadata_input['session_description'] = 'Unknown'
+                name = self.metadata_input['stimulus']['name']
+                self.metadata_input['session_description'], _ = check_stimulus_name(name)
+            except (KeyError, ValueError):
+                self.metadata_input['session_description'] = 'Unknown stimulus'
 
         device_metadata = self.metadata_input['device']
         for key in ('ECoG', 'Poly'):
@@ -346,7 +347,7 @@ class LegacyMetadataReader(MetadataReader):
         # final touches...
         if self.experiment_type == 'auditory':
             self.metadata_input['experiment_description'] = 'Auditory experiment'
-        self.metadata_input['session_description'] = check_stimulus_name(self.metadata_input['stimulus']['name'])
+        self.metadata_input['session_description'], _ = check_stimulus_name(self.metadata_input['stimulus']['name'])
 
     def __add_old_experiment_notes(self):
         notes = self.metadata_input['notes'].strip(' ')
