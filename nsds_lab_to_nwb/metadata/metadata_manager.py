@@ -347,10 +347,7 @@ class LegacyMetadataReader(MetadataReader):
         # final touches...
         if self.experiment_type == 'auditory':
             self.metadata_input['experiment_description'] = 'Auditory experiment'
-        if ('session_description' not in self.metadata_input
-                or len(self.metadata_input['session_description']) == 0):
-            self.metadata_input['session_description'] = (
-                'Auditory experiment with {} stimulus'.format(self.metadata_input['stimulus']['name']))
+        self.metadata_input['session_description'] = check_stimulus_name(self.metadata_input['stimulus']['name'])
 
     def __add_old_experiment_notes(self):
         notes = self.metadata_input['notes'].strip(' ')
